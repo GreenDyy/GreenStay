@@ -35,8 +35,8 @@ const TextComponent = (props: Props) => {
                 {
                     color: color ?? appColors.text,
                     flex: flex ?? 0,
-                    fontSize: fontSize ?? (isTitle ? 24 : fontSizeDefault),
-                    fontFamily: fontFamily ?? (isTitle ? appFonts.airBnBSemiBold : appFonts.airBnBRegular),
+                    fontSize: fontSize ?? (isTitle ? 22 : fontSizeDefault),
+                    fontFamily: fontFamily ?? (isTitle ? appFonts.boldOpenSans : appFonts.regularOpenSans),
                 },
                 style,
             ]}

@@ -1,6 +1,8 @@
 export const appFonts = {
-    airBnBRegular: 'Roboto-Regular',
-    airBnBMedium: 'Roboto-Medium',
-    airBnBBold: 'Roboto_Bold',
-    airBnBSemiBold: 'Roboto-Black',
-}
+    lightOpenSans: 'OpenSans-Light',
+    regularOpenSans: 'OpenSans-Regular',
+    mediumOpenSans: 'OpenSans-Medium',
+    semiBoldOpenSans: 'OpenSans-SemiBold',
+    boldOpenSans: 'OpenSans-Bold',
+    extraBoldOpenSans: 'OpenSans-ExtraBold',
+};
