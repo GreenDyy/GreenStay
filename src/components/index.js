@@ -10,6 +10,7 @@ import TabBarComponent from "./TabBarComponent";
 import FloatAddButtonComponent from "./FloatAddButtonComponent";
 import ButtonComponent from "./ButtonComponent";
 import AvatarGroupComponent from "./AvatarGroupComponent";
+import DrawerCustom from "./DrawerCustom";
 
 export {
     TextComponent,
@@ -24,4 +25,5 @@ export {
     FloatAddButtonComponent,
     ButtonComponent,
     AvatarGroupComponent,
+    DrawerCustom,
 }

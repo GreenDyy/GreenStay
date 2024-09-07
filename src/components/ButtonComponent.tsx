@@ -9,15 +9,27 @@ interface Props {
     text: string
     style?: StyleProp<ViewStyle>
     onPress: () => void
+    type?: 'primary' | 'link'
 }
 
 const ButtonComponent = (props: Props) => {
-    const { text, style, onPress } = props
+    const { text, style, onPress, type = 'primary' } = props
     return (
-        <TouchableOpacity style={[globalStyle.button, {}, style]}
-            onPress={onPress}>
-            <TextComponent text={text} color={appColors.white} fontFamily={appFonts.semiBoldOpenSans} />
-        </TouchableOpacity>
+        <>
+            {type === 'primary' ?
+                <TouchableOpacity style={[globalStyle.button, {}, style]}
+                    onPress={onPress}>
+                    <TextComponent text={text} color={appColors.white} fontFamily={appFonts.semiBoldOpenSans} />
+                </TouchableOpacity>
+                :
+                <TouchableOpacity onPress={onPress}>
+                    <TextComponent text={text} color={appColors.primary} fontFamily={appFonts.mediumOpenSans}
+                        style={[style, {
+                            textDecorationLine: 'underline',
+
+                        }]} />
+                </TouchableOpacity>
+            }</>
     )
 }
 

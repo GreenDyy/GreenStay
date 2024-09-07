@@ -32,7 +32,7 @@ const categoryData = [
 
 const HomeScreen = ({ navigation }) => {
 
-  const renderItemCategory = ({ item }) => {
+  const renderItemCategory = (item) => {
     return (
       <View key={item.id} style={{
         marginTop: 10,
@@ -116,12 +116,11 @@ const HomeScreen = ({ navigation }) => {
       {/* Giá các thành phần */}
       <SectionComponent>
         <TabBarComponent title='Giá các phần' onPress={() => Alert.alert('Thông báo')} />
-        <FlatList
-          data={categoryData}
-          renderItem={renderItemCategory}
-          numColumns={4}
-          columnWrapperStyle={{ justifyContent: 'center' }}
-        />
+        <RowComponent>
+          {categoryData.map((item) => {
+            return renderItemCategory(item)
+          })}
+        </RowComponent>
       </SectionComponent>
 
       <SectionComponent>

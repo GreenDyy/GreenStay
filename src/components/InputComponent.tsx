@@ -14,13 +14,14 @@ interface Props {
   value: string
   numberOfLines?: number
   onChangeText: (val: any) => void
-  onEndEditing: (val: any) => void
+  onEndEditing: () => void
   iconLeft?: ReactNode
   title?: string
-  keyboardType?: 'number-pad';
+  keyboardType?: 'number-pad'
+  isRequire?: boolean
 }
 const InputComponent = (props: Props) => {
-  const { title, allowClear, placeholder, isPassword, value, numberOfLines, onChangeText, onEndEditing, iconLeft, keyboardType } = props
+  const { title, allowClear, placeholder, isPassword, value, numberOfLines, onChangeText, onEndEditing, iconLeft, keyboardType, isRequire } = props
   const [isShowPass, setIsShowPass] = useState(false)
 
   const handlePressRightButton = () => {
@@ -36,7 +37,10 @@ const InputComponent = (props: Props) => {
     <>
       {title && (
         <>
-          <TextComponent text={title} fontFamily={appFonts.semiBoldOpenSans} />
+          <RowComponent style={{ justifyContent: 'flex-start' }}>
+            <TextComponent text={title} fontFamily={appFonts.semiBoldOpenSans} />
+            {isRequire && <TextComponent text=' *' color={appColors.danger} />}
+          </RowComponent>
           <SpaceComponent height={8} />
         </>
       )}
@@ -65,7 +69,7 @@ const InputComponent = (props: Props) => {
               multiline={numberOfLines ? true : false}
               onChangeText={val => onChangeText(val)}
               onEndEditing={onEndEditing}
-              secureTextEntry={isPassword && isShowPass}
+              secureTextEntry={isPassword && !isShowPass}
               keyboardType={keyboardType ?? 'default'}
             />
           </RowComponent>
