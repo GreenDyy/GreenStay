@@ -7,7 +7,7 @@ import { appColors } from '../constants/appColors'
 interface Props {
     size?: number
     data: [{
-        imageUrl: string
+        photoUrl: string
     }]
 }
 
@@ -42,7 +42,7 @@ const AvatarGroupComponent = (props: Props) => {
                         marginLeft: index !== 0 ? -10 : 0,
                         zIndex: 10 - index
                     }}>
-                        <Image source={{ uri: item.imageUrl }} resizeMode='cover' style={{ height: size ?? 24, width: size ?? 24 }} />
+                        <Image source={{ uri: item.photoUrl }} resizeMode='cover' style={{ height: size ?? 24, width: size ?? 24 }} />
                     </CircleComponent>
                 )
             })}

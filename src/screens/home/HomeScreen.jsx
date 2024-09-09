@@ -1,11 +1,13 @@
 import { ArrowCircleDown, Building4, CpuCharge, Drop, Electricity, Flash, Notification, Trash, Wind } from 'iconsax-react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Alert, FlatList, Image, View } from 'react-native'
 import { CircleComponent, ContainerComponent, RowComponent, SectionComponent, SpaceComponent, SquareBorderComponent, TabBarComponent, TextComponent } from '../../components'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import Icon from 'react-native-vector-icons/Ionicons';
+import { removeItemDataStorage } from '../../utils/Utils'
+import axios from 'axios'
 
 const categoryData = [
   {
@@ -115,7 +117,7 @@ const HomeScreen = ({ navigation }) => {
 
       {/* Giá các thành phần */}
       <SectionComponent>
-        <TabBarComponent title='Giá các phần' onPress={() => Alert.alert('Thông báo')} />
+        <TabBarComponent title='Giá các phần' onPress={() => removeItemDataStorage('accessToken')} />
         <RowComponent>
           {categoryData.map((item) => {
             return renderItemCategory(item)

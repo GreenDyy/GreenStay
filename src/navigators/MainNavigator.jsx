@@ -5,7 +5,8 @@ import DrawerNavigator from './DrawerNavigator'
 
 const MainNavigator = () => {
     return (
-        <DrawerNavigator />
+        // <DrawerNavigator />
+        <BottomTabNavigator />
     )
 }
 

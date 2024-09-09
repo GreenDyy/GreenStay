@@ -17,7 +17,7 @@ const AppRouter = () => {
         };
         console.log('lấy dc token: ', accessToken)
         fetchAccessToken();
-    }, [accessToken])
+    }, [])
 
     useEffect(() => {
 
@@ -30,7 +30,6 @@ const AppRouter = () => {
     return (
         <>
             <StatusBar translucent backgroundColor={appColors.white} barStyle="dark-content" />
-
             {isShowSplash ? <SplashScreen /> : (accessToken ? < MainNavigator /> : <AuthRouter />)}
         </>
 
