@@ -42,7 +42,7 @@ const BottomTabNavigator = () => {
                     case 'Main':
                         icon = (
                             <View style={{ paddingBottom: 55 }}>
-                                <CircleComponent size={50} style={[globalStyle.shadow]}>
+                                <CircleComponent size={50} style={[globalStyle.shadow]} color={appColors.primary}>
                                     <ScanBarcode size={size + 6} color={appColors.white} variant='Bold' />
                                 </CircleComponent>
                             </View>

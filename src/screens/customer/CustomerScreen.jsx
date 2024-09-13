@@ -2,7 +2,7 @@ import { ArrowCircleRight, SearchStatus } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
 import { Alert, FlatList, Image, View } from 'react-native'
 import { apiCustomer } from '../../apis/apiDTHome'
-import { CircleComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import { CircleComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import InputComponent from '../../components/InputComponent'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
@@ -11,16 +11,24 @@ import { images } from '../../constants/images'
 const CustomerScreen = () => {
   const [searchKey, setSearchKey] = useState('')
   const [dataCustomers, setDataCustomers] = useState([])
-
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    const url = '/get-all'
-    const fetchDataCustomers = async () => {
-      const data = await apiCustomer(url, null, 'get')
-      setDataCustomers(data.data)
-    }
     fetchDataCustomers()
   }, [])
+
+  const fetchDataCustomers = async () => {
+    setIsLoading(true)
+    try {
+      const res = await apiCustomer(`/get-all`, null, 'get')
+      setDataCustomers(res)
+      setIsLoading(false)
+    }
+    catch (e) {
+      console.log(e)
+      setIsLoading(false)
+    }
+  }
 
   // xem vui thoi
   useEffect(() => {
@@ -39,9 +47,10 @@ const CustomerScreen = () => {
       <RowComponent
         onPress={() => { handleOpenDetailCustomer() }}
         style={{
-          borderBottomWidth: 1,
+          borderBottomWidth: 0.5,
+          borderBottomColor: appColors.gray,
           paddingVertical: 10,
-          paddingTop: item.id === 1 && 0
+          paddingTop: item.customerId === 1 && 0
         }}
       >
         <RowComponent style={{
@@ -58,9 +67,7 @@ const CustomerScreen = () => {
         </RowComponent>
 
         <RowComponent >
-          <TextComponent text='Phòng 5' fontSize={12} color={appColors.text} />
-          <SpaceComponent width={5} />
-          <ArrowCircleRight size={15} color={appColors.text} />
+          <ArrowCircleRight size={20} color={appColors.gray} />
         </RowComponent>
       </RowComponent>
     )
@@ -91,10 +98,12 @@ const CustomerScreen = () => {
         <FlatList
           data={dataCustomers}
           renderItem={renderItemCustomer}
+          keyExtractor={(item, index) => index.toString()}
         />
 
       </SectionComponent>
       <FloatAddButtonComponent onPress={handleAddNewCustomer} />
+      <LoadingModalComponent visible={isLoading} />
     </ContainerComponent>
   )
 }

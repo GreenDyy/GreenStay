@@ -11,7 +11,7 @@ const apiCustomer = async (url, data = null, method = 'get') => {
 const apiRoom = async (url, data = null, method = 'get') => {
     return await axiosClient(`/Room${url}`, {
         method: method ?? 'get',
-        data
+        data,
     })
 }
 

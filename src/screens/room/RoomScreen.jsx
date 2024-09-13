@@ -1,82 +1,79 @@
 import { Grid2, Layer, SearchStatus } from 'iconsax-react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
 import LinearGradient from 'react-native-linear-gradient';
-import { apiMemberOfRental, apiRental, apiRoom } from '../../apis/apiDTHome';
-import { AvatarGroupComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components';
+import { apiCustomer, apiMemberOfRental, apiRental, apiRoom } from '../../apis/apiDTHome';
+import { AvatarGroupComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, LoadingModalComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components';
 import InputComponent from '../../components/InputComponent';
 import { appColors } from '../../constants/appColors';
 import { appFonts } from '../../constants/appFonts';
 import { globalStyle } from '../../styles/globalStyle';
 import { images } from '../../constants/images';
+import { appInfors } from '../../constants/appInfors';
+import { useFocusEffect } from '@react-navigation/native';
 
-const dataAvatarGroup = [
-  {
-    photoUrl: 'https://i.pinimg.com/736x/28/dc/36/28dc36d443030e5222e4b39118f18d4e.jpg'
-  },
-  {
-    photoUrl: 'https://i.pinimg.com/236x/29/eb/91/29eb91eea74ada9d3cbe4d31b6c83aff.jpg'
-  },
-  {
-    photoUrl: 'https://i.pinimg.com/236x/0f/35/2a/0f352aaa89b3bba0879f18ed1b476bbe.jpg'
-  },
-  {
-    photoUrl: 'https://i.pinimg.com/474x/8b/09/f0/8b09f0c3027fec4fa72c6e0879195d09.jpg'
-  },
-]
-
-const RoomScreen = ({ navigation }) => {
+const RoomScreen = ({ navigation, route }) => {
+  const { callAgain } = route.params || { callAgain: -999 }
   const [isGrid, setIsGird] = useState(true)
   const [searchKey, setSearchKey] = useState('')
   const [dataRooms, setDataRooms] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    fetchApi();
-  }, []);
+    fetchApi()
+  }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchApi()
+    }, [])
+  )
+
 
   const fetchApi = async () => {
     const url = '/get-all';
     try {
+      setIsLoading(true)
       const newDataRooms = []
       const res = await apiRoom(url)
 
-      for (const room of res.data) {
-        if (room.isAvailable) {
+      for (const room of res) {
+        if (!room.isAvailable) {
           try {
             const rental = await apiRental(`/get-by-room-and-status/${room.roomId}/true`);
-            // vấn đề ở rental
-            console.log('rental nè', rental.data)
-            if (rental.status === 200) {
-              const members = await apiMemberOfRental(`/get-all-by-rental/${rental.data.rentalId}`);
-              console.log('rental nè:', members)
-              newDataRooms.push({ ...room, members });
+
+            const members = await apiMemberOfRental(`/get-all-by-rental/${rental.rentalId}`);
+
+            const newMembers = []
+            for (const customer of members) {
+              const cus = await apiCustomer(`/${customer.customerId}`)
+              newMembers.push({ ...cus })
+              console.log('cus nè:', cus)
             }
-            else {
-              newDataRooms.push(room);
-            }
+            newDataRooms.push({ ...room, members: newMembers });
 
 
           } catch (error) {
             console.error(`Error fetching members for room ${room.roomId}:`, error);
+            setIsLoading(false)
 
           }
         } else {
           newDataRooms.push(room); // Thêm phòng mà không thay đổi gì
         }
       }
-
-      setDataRooms(newDataRooms);
+      setDataRooms(newDataRooms)
+      setIsLoading(false)
     } catch (error) {
       console.error('Lỗi api:', error);
+      setIsLoading(false)
     }
   }
 
-  const
-
-    useEffect(() => {
-      console.log('room nè:', dataRooms)
-    }, [dataRooms])
+  useEffect(() => {
+    console.log('room nè0:', dataRooms)
+  }, [dataRooms])
 
   const handleDetailRoom = (roomId) => {
     navigation.navigate('DetailRoomScreen', { roomId: roomId })
@@ -91,11 +88,11 @@ const RoomScreen = ({ navigation }) => {
           resizeMode='cover' />
         <SpaceComponent height={14} />
         <TextComponent text={item.roomName} fontFamily={appFonts.boldOpenSans} />
-        {item.isAvailable ?
+        {!item.isAvailable ?
           <>
             <TextComponent text='Số người hiện tại: 3' fontSize={12} />
             <SpaceComponent height={5} />
-            <AvatarGroupComponent data={dataAvatarGroup} />
+            <AvatarGroupComponent data={item?.members} />
           </>
           :
           <TextComponent text='Phòng trống' fontSize={12} color={appColors.danger} />
@@ -122,11 +119,11 @@ const RoomScreen = ({ navigation }) => {
             paddingVertical: 10,
           }}>
             <TextComponent text={item.roomName} fontFamily={appFonts.boldOpenSans} color={appColors.white} />
-            {item.isAvailable ?
+            {!item.isAvailable ?
               <>
                 <TextComponent text='Số người hiện tại: 3' fontSize={12} color={appColors.white} />
                 <SpaceComponent height={8} />
-                <AvatarGroupComponent data={dataAvatarGroup} />
+                <AvatarGroupComponent data={item?.members} />
               </>
               :
               <TextComponent text='Phòng trống' fontSize={12} color={appColors.danger} />
@@ -170,7 +167,8 @@ const RoomScreen = ({ navigation }) => {
         initialNumToRender={6}
         maxToRenderPerBatch={10}
       />
-      <FloatAddButtonComponent onPress={() => navigation.navigate('AddNewRoomScreen')} />
+      <FloatAddButtonComponent onPress={() => navigation.navigate('AddNewRoomScreen', { actionType: 'create' })} />
+      <LoadingModalComponent visible={isLoading} />
     </ContainerComponent>
   )
 }
@@ -183,7 +181,7 @@ const localStyle = StyleSheet.create({
     borderWidth: 1,
     borderColor: appColors.gray2,
     height: 220,
-    width: 180,
+    width: appInfors.sizes.WIDTH * 0.43,
     marginTop: 0,
     marginBottom: 14,
     marginHorizontal: 10,

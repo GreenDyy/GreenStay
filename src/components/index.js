@@ -11,6 +11,7 @@ import FloatAddButtonComponent from "./FloatAddButtonComponent";
 import ButtonComponent from "./ButtonComponent";
 import AvatarGroupComponent from "./AvatarGroupComponent";
 import DrawerCustom from "./DrawerCustom";
+import LoadingModalComponent from "./LoadingModalComponent";
 
 export {
     TextComponent,
@@ -26,4 +27,5 @@ export {
     ButtonComponent,
     AvatarGroupComponent,
     DrawerCustom,
+    LoadingModalComponent,
 }
