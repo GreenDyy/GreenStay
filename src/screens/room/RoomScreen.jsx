@@ -14,24 +14,17 @@ import { appInfors } from '../../constants/appInfors';
 import { useFocusEffect } from '@react-navigation/native';
 
 const RoomScreen = ({ navigation, route }) => {
-  const { callAgain } = route.params || { callAgain: -999 }
   const [isGrid, setIsGird] = useState(true)
   const [searchKey, setSearchKey] = useState('')
   const [dataRooms, setDataRooms] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    fetchApi()
-  }, [])
+    fetchDataRooms()
+    navigation.setParams({ roomUpdate: false });
+  }, [route.params?.roomUpdate])
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchApi()
-    }, [])
-  )
-
-
-  const fetchApi = async () => {
+  const fetchDataRooms = async () => {
     const url = '/get-all';
     try {
       setIsLoading(true)

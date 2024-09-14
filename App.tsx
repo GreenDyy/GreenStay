@@ -4,14 +4,19 @@ import AppRouter from './src/navigators/AppRouter';
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import FlashMessage from 'react-native-flash-message';
 import { StatusBar } from 'react-native';
+import { Provider } from 'react-redux';
+import store from './src/srcRedux/store';
 
 const App = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <AppRouter />
-      </NavigationContainer>
-      <FlashMessage position="top" statusBarHeight={StatusBar.currentHeight} />
+      <Provider store={store}>
+        <NavigationContainer>
+          <AppRouter />
+        </NavigationContainer>
+        <FlashMessage position="top" statusBarHeight={StatusBar.currentHeight} />
+      </Provider>
+
     </GestureHandlerRootView>
   )
 }

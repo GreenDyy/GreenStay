@@ -8,6 +8,8 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import Icon from 'react-native-vector-icons/Ionicons';
 import { removeItemDataStorage } from '../../utils/Utils'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { removeAuth } from '../../srcRedux/reducers/authReducer'
 
 const categoryData = [
   {
@@ -33,7 +35,7 @@ const categoryData = [
 ]
 
 const HomeScreen = ({ navigation }) => {
-
+  const dispatch = useDispatch()
   const renderItemCategory = (item) => {
     return (
       <View key={item.id} style={{
@@ -67,7 +69,7 @@ const HomeScreen = ({ navigation }) => {
       <SectionComponent>
 
         <RowComponent>
-          <CircleComponent onPress={() => Alert.alert('Đây là avatar')}>
+          <CircleComponent onPress={() => dispatch(removeAuth())}>
             <Image source={{ uri: 'https://i.pinimg.com/236x/93/13/aa/9313aaef3c4edb2481fba31378631db5.jpg' }} style={{ height: 40, width: 40 }} resizeMode='cover' />
           </CircleComponent>
 

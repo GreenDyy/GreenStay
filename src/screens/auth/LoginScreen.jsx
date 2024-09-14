@@ -1,16 +1,40 @@
-import React, { useState } from 'react'
-import { ButtonComponent, ContainerComponent, HeaderComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import React, { useEffect, useState } from 'react'
+import { ButtonComponent, ContainerComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import { setDataStorage } from '../../utils/Utils'
 import InputComponent from '../../components/InputComponent'
 import { Image } from 'react-native'
 import { images } from '../../constants/images'
+import { useDispatch } from 'react-redux'
+import { addAuth } from '../../srcRedux/reducers/authReducer'
 
 const LoginScreen = ({ navigation }) => {
     const [phoneNumber, setPhoneNumber] = useState('')
     const [password, setPassword] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+
+    }, [])
 
     const handleLogin = async () => {
-        await setDataStorage('accessToken', 'token')
+        setIsLoading(true)
+        try {
+            const authData = {
+                id: 0,
+                phoneNumber: phoneNumber,
+                accessToken: 'laytubackend'
+            }
+            dispatch(addAuth(authData))
+            await setDataStorage('authData', authData)
+
+            setIsLoading(false)
+        }
+        catch (error) {
+            console.error('Error during login:', error)
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -53,7 +77,7 @@ const LoginScreen = ({ navigation }) => {
                     <ButtonComponent text='Đăng ký ngay!' type='link' onPress={() => { navigation.navigate('SignUpScreen') }} />
                 </RowComponent>
             </SectionComponent>
-
+            <LoadingModalComponent visible={isLoading} />
         </ContainerComponent >
     )
 }

@@ -1,11 +1,23 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const getDataStorage = async (key) => {
-    return await AsyncStorage.getItem(key)
+    try {
+        const value = await AsyncStorage.getItem(key)
+        return JSON.parse(value)
+    }
+    catch (e) {
+        console.log('Lỗi lấy AsynStorage: ', e)
+    }
 }
 
 const setDataStorage = async (key, value) => {
-    await AsyncStorage.setItem(key, value)
+    try {
+        const newValue = JSON.stringify(value)
+        await AsyncStorage.setItem(key, newValue)
+    }
+    catch (e) {
+        console.log('Lỗi lưu AsynStorage: ', e)
+    }
 }
 
 const removeItemDataStorage = async (key) => {

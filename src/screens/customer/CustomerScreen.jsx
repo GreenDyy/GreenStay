@@ -7,8 +7,9 @@ import InputComponent from '../../components/InputComponent'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
 import { images } from '../../constants/images'
+import { useNavigation } from '@react-navigation/native'
 
-const CustomerScreen = () => {
+const CustomerScreen = ({ navigation }) => {
   const [searchKey, setSearchKey] = useState('')
   const [dataCustomers, setDataCustomers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -38,14 +39,12 @@ const CustomerScreen = () => {
     console.log('data cus:', dataCustomers)
   }, [dataCustomers])
 
-  const handleOpenDetailCustomer = () => {
-    Alert.alert('Chi tiết khách nè')
-  }
+
 
   const renderItemCustomer = ({ item }) => {
     return (
       <RowComponent
-        onPress={() => { handleOpenDetailCustomer() }}
+        onPress={() => navigation.navigate('DetailCustomerScreen', { customerId: item.customerId })}
         style={{
           borderBottomWidth: 0.5,
           borderBottomColor: appColors.gray,

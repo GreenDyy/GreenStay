@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { ButtonComponent, ContainerComponent, HeaderComponent, LoadingModalComponent, SectionComponent, SpaceComponent } from '../../components'
 import InputComponent from '../../components/InputComponent'
@@ -48,9 +48,10 @@ const AddNewRoomScreen = ({ navigation, route }) => {
 
   const handleCreateNewRoom = async () => {
     const url = '/create'
+    setIsLoading(true)
     try {
       await apiRoom(url, dataRoom, 'post')
-      navigation.navigate('RoomScreen', { callAgain: roomId })
+      navigation.navigate('RoomScreen', { roomUpdate: true })
       showMessage({
         message: "Thông báo",
         description: "Thêm phòng thành công",
@@ -67,10 +68,11 @@ const AddNewRoomScreen = ({ navigation, route }) => {
   }
 
   const handleUpdateRoom = async () => {
+    setIsLoading(true)
     try {
       const newDataRoom = { ...dataRoom, updatedAt: new Date() }
       await apiRoom(`/update/${roomId}`, newDataRoom, 'put')
-      navigation.navigate('RoomScreen', { callAgain: roomId })
+      navigation.navigate('RoomScreen', { roomUpdate: true })
       showMessage({
         message: "Thông báo",
         description: "Sửa phòng thành công",
@@ -88,14 +90,9 @@ const AddNewRoomScreen = ({ navigation, route }) => {
 
   const handleDeleteRoom = async () => {
     setIsLoading(true)
-    showMessage({
-      message: "Thông báo",
-      description: "Xoá phòng thất bại",
-      type: "danger",
-    })
     try {
       await apiRoom(`/delete/${roomId}`, {}, 'delete')
-      navigation.navigate('RoomScreen', { callAgain: roomId })
+      navigation.navigate('RoomScreen', { roomUpdate: true })
       showMessage({
         message: "Thông báo",
         description: "Xoá phòng thành công",
@@ -120,6 +117,20 @@ const AddNewRoomScreen = ({ navigation, route }) => {
         buttonRight={<Trash size={20} color={appColors.danger} />}
         onRightPress={handleDeleteRoom}
       />
+
+      <SectionComponent>
+        {
+          actionType === 'create'
+            ?
+            <ButtonComponent text='Thêm ảnh minh hoạ' type='link' onPress={() => { }} />
+            :
+            <ButtonComponent text='Thay đổi minh hoạ' type='link' onPress={() => { }} />
+        }
+        <SpaceComponent height={8} />
+        {dataRoom.photoUrl && <Image source={{ uri: dataRoom?.photoUrl }} style={{ height: 150, width: '100%', borderRadius: 10 }} resizeMode='cover' />}
+
+      </SectionComponent>
+
       <SectionComponent>
         <InputComponent
           title='Tên phòng'

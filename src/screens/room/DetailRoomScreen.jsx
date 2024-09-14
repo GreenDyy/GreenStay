@@ -23,14 +23,18 @@ const DetailRoomScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         fetchDataRoom()
-        fetchDataCustomers()
     }, [])
+
+    useEffect(() => {
+        fetchDataMemberOfRoom()
+    }, [dataRoom])
 
     const fetchDataRoom = async () => {
         setIsLoading(true)
         try {
             const data = await apiRoom(`/${roomId}`)
             setDataRoom(data)
+            console.log('data room nè: ', data)
             setIsLoading(false)
         }
         catch (e) {
@@ -39,7 +43,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
         }
     }
 
-    const fetchDataCustomers = async () => {
+    const fetchDataMemberOfRoom = async () => {
         setIsLoading(true)
         try {
             if (!dataRoom.isAvailable) {
@@ -49,8 +53,8 @@ const DetailRoomScreen = ({ navigation, route }) => {
                 for (const customer of members) {
                     const cus = await apiCustomer(`/${customer.customerId}`)
                     newMembers.push({ ...cus })
-                    console.log('cus nè:', cus)
                 }
+                console.log('cus nè:', newMembers)
                 setDataCustomers(newMembers)
             }
             setIsLoading(false)
@@ -64,7 +68,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
     const renderItemCustomer = ({ item }) => {
         return (
             <RowComponent
-                onPress={() => { handleOpenDetailCustomer() }}
+                onPress={() => navigation.navigate('DetailCustomerScreen', { customerId: item?.customerId })}
                 style={{
                     borderBottomWidth: 0.5,
                     borderBottomColor: appColors.gray,
@@ -104,12 +108,19 @@ const DetailRoomScreen = ({ navigation, route }) => {
                         actionType: 'update'
                     })}
             />
+
+            {dataRoom.photoUrl &&
+                <SectionComponent>
+                    <Image source={{ uri: dataRoom?.photoUrl }} style={{ height: 150, width: '100%', borderRadius: 10 }} resizeMode='cover' />
+                </SectionComponent>
+            }
             <SectionComponent>
                 <TextComponent text={dataRoom?.roomName} />
             </SectionComponent>
 
             <SectionComponent>
                 <TabBarComponent title='Danh sách người thuê' />
+                <SpaceComponent height={14} />
                 <FlatList
                     data={dataCustomers}
                     renderItem={renderItemCustomer}
