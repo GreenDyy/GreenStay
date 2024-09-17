@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "729718367743",
+    "project_id": "dthone-812dc",
+    "storage_bucket": "dthone-812dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:729718367743:android:c5645880d2d076546033ca",
+        "android_client_info": {
+          "package_name": "com.greenstay"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXENpJJv5KKjw_xIHe68ko2cuBtTyUNzQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

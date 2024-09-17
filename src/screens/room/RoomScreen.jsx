@@ -42,7 +42,6 @@ const RoomScreen = ({ navigation, route }) => {
             for (const customer of members) {
               const cus = await apiCustomer(`/${customer.customerId}`)
               newMembers.push({ ...cus })
-              console.log('cus nè:', cus)
             }
             newDataRooms.push({ ...room, members: newMembers });
 
@@ -64,9 +63,9 @@ const RoomScreen = ({ navigation, route }) => {
     }
   }
 
-  useEffect(() => {
-    console.log('room nè0:', dataRooms)
-  }, [dataRooms])
+  // useEffect(() => {
+  //   console.log('ds room nè:', dataRooms)
+  // }, [dataRooms])
 
   const handleDetailRoom = (roomId) => {
     navigation.navigate('DetailRoomScreen', { roomId: roomId })

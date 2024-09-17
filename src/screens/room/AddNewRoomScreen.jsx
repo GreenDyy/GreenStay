@@ -1,11 +1,12 @@
-import { View, Text, Image } from 'react-native'
+import { View, Text, Image, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { ButtonComponent, ContainerComponent, HeaderComponent, LoadingModalComponent, SectionComponent, SpaceComponent } from '../../components'
+import { ButtonComponent, ContainerComponent, HeaderComponent, ImagePickerComponent, LoadingModalComponent, SectionComponent, SpaceComponent } from '../../components'
 import InputComponent from '../../components/InputComponent'
 import { apiRoom } from '../../apis/apiDTHome'
 import { showMessage } from 'react-native-flash-message'
 import { appColors } from '../../constants/appColors'
 import { Trash } from 'iconsax-react-native'
+import storage from '@react-native-firebase/storage';
 
 const initRoom = {
   roomName: '',
@@ -19,6 +20,7 @@ const initRoom = {
 const AddNewRoomScreen = ({ navigation, route }) => {
   const { roomId, actionType } = route.params
   const [dataRoom, setDataRoom] = useState(initRoom)
+  const [imageSelected, setImageSelected] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
@@ -46,17 +48,56 @@ const AddNewRoomScreen = ({ navigation, route }) => {
     }
   }
 
+  const upLoadImage = async () => {
+    try {
+      const fileExtension = imageSelected.mime.split('/')[1]; // lấy phần đuôi tệp từ mime
+      const fileName = `room-${imageSelected.modificationDate}.${fileExtension}`;
+      const pathFireBase = `images/rooms/${fileName}`;
+
+      console.log('tên ảnh: ', fileName)
+
+      // Upload file lên Firebase
+      const uploadTask = storage().ref(pathFireBase).putFile(imageSelected.path);
+
+      uploadTask.on('state_changed', (snapshot) => {
+        // Xử lý quá trình upload (có thể thêm thông báo tiến độ)
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`);
+      });
+
+      await uploadTask;
+
+      const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+      console.log('image được lưu tại: ', downloadURL);
+      return downloadURL;
+
+    } catch (error) {
+      console.error('Error uploading image: ', error);
+      showMessage({
+        message: "Lỗi",
+        description: "Đã xảy ra lỗi khi tải ảnh lên",
+        type: "danger",
+      });
+      return null;
+    }
+  }
+
   const handleCreateNewRoom = async () => {
     const url = '/create'
     setIsLoading(true)
     try {
-      await apiRoom(url, dataRoom, 'post')
-      navigation.navigate('RoomScreen', { roomUpdate: true })
-      showMessage({
-        message: "Thông báo",
-        description: "Thêm phòng thành công",
-        type: "success",
-      })
+      const downloadURL = await upLoadImage();
+      if (downloadURL) {
+        handleChangeValue('photoUrl', downloadURL);
+        await apiRoom(url, { ...dataRoom, photoUrl: downloadURL }, 'post')
+        navigation.navigate('RoomScreen', { roomUpdate: true })
+        showMessage({
+          message: "Thông báo",
+          description: "Thêm phòng thành công",
+          type: "success",
+        })
+      }
+
     }
     catch {
       showMessage({
@@ -70,14 +111,19 @@ const AddNewRoomScreen = ({ navigation, route }) => {
   const handleUpdateRoom = async () => {
     setIsLoading(true)
     try {
-      const newDataRoom = { ...dataRoom, updatedAt: new Date() }
-      await apiRoom(`/update/${roomId}`, newDataRoom, 'put')
-      navigation.navigate('RoomScreen', { roomUpdate: true })
-      showMessage({
-        message: "Thông báo",
-        description: "Sửa phòng thành công",
-        type: "success",
-      })
+
+      const downloadURL = await upLoadImage();
+      if (downloadURL) {
+        const newDataRoom = { ...dataRoom, photoUrl: downloadURL, updatedAt: new Date() }
+        await apiRoom(`/update/${roomId}`, newDataRoom, 'put')
+        navigation.navigate('RoomScreen', { roomUpdate: true })
+        showMessage({
+          message: "Thông báo",
+          description: "Sửa phòng thành công",
+          type: "success",
+        })
+      }
+
     }
     catch {
       showMessage({
@@ -89,27 +135,55 @@ const AddNewRoomScreen = ({ navigation, route }) => {
   }
 
   const handleDeleteRoom = async () => {
-    setIsLoading(true)
-    try {
-      await apiRoom(`/delete/${roomId}`, {}, 'delete')
-      navigation.navigate('RoomScreen', { roomUpdate: true })
-      showMessage({
-        message: "Thông báo",
-        description: "Xoá phòng thành công",
-        type: "success",
-      })
-      setIsLoading(false)
-    }
-    catch (e) {
-      console.log('Xoá phòng thất bại')
-      showMessage({
-        message: "Thông báo",
-        description: "Xoá phòng thất bại",
-        type: "danger",
-      })
-      setIsLoading(false)
-    }
-  }
+    Alert.alert(
+      "Xác nhận",
+      "Bạn có chắc chắn muốn xoá phòng này không?",
+      [
+        {
+          text: "Huỷ",
+          onPress: () => console.log("Huỷ xoá phòng"),
+          style: 'cancel'
+        },
+        {
+          text: "Xoá",
+          onPress: async () => {
+            setIsLoading(true);
+            try {
+
+              try {
+                const fileRef = storage().refFromURL(dataRoom.photoUrl);
+                if (fileRef) {
+                  await fileRef.delete();
+                  console.log('Ảnh đã được xoá khỏi Firebase Storage');
+                }
+
+              } catch (error) {
+                console.error('Lỗi khi xoá ảnh: ', error);
+              }
+
+              await apiRoom(`/delete/${roomId}`, {}, 'delete');
+              navigation.navigate('RoomScreen', { roomUpdate: true });
+              showMessage({
+                message: "Thông báo",
+                description: "Xoá phòng thành công",
+                type: "success",
+              });
+            } catch (e) {
+              console.log('Xoá phòng thất bại');
+              showMessage({
+                message: "Thông báo",
+                description: "Xoá phòng thất bại",
+                type: "danger",
+              });
+            }
+            setIsLoading(false);
+          },
+          style: "destructive"
+        }
+      ],
+      { cancelable: true }
+    )
+  };
 
   return (
     <ContainerComponent>
@@ -119,15 +193,12 @@ const AddNewRoomScreen = ({ navigation, route }) => {
       />
 
       <SectionComponent>
-        {
-          actionType === 'create'
-            ?
-            <ButtonComponent text='Thêm ảnh minh hoạ' type='link' onPress={() => { }} />
-            :
-            <ButtonComponent text='Thay đổi minh hoạ' type='link' onPress={() => { }} />
-        }
+        <ImagePickerComponent text={actionType === 'create' ? 'Thêm ảnh minh hoạ' : 'Thay đổi ảnh minh hoạ'} onSelect={(val) => { setImageSelected(val) }} />
         <SpaceComponent height={8} />
-        {dataRoom.photoUrl && <Image source={{ uri: dataRoom?.photoUrl }} style={{ height: 150, width: '100%', borderRadius: 10 }} resizeMode='cover' />}
+        {imageSelected
+          ? <Image source={{ uri: imageSelected?.path }} style={{ height: 150, width: '100%', borderRadius: 10 }} resizeMode='cover' />
+          : dataRoom.photoUrl && <Image source={{ uri: dataRoom?.photoUrl }} style={{ height: 150, width: '100%', borderRadius: 10 }} resizeMode='cover' />
+        }
 
       </SectionComponent>
 

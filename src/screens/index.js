@@ -8,6 +8,7 @@ import SignUpScreen from "./auth/SignUpScreen"
 import AddNewRoomScreen from "./room/AddNewRoomScreen"
 import DetailRoomScreen from "./room/DetailRoomScreen"
 import DetailCustomerScreen from "./customer/DetailCustomerScreen"
+import AddNewCustomerScreen from "./customer/AddNewCustomerScreen"
 
 export {
     HomeScreen,
@@ -20,5 +21,6 @@ export {
     AddNewRoomScreen,
     DetailRoomScreen,
     DetailCustomerScreen,
+    AddNewCustomerScreen,
 
 }

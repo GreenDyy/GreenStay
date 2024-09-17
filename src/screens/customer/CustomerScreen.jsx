@@ -1,15 +1,14 @@
 import { ArrowCircleRight, SearchStatus } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
-import { Alert, FlatList, Image, View } from 'react-native'
+import { FlatList, Image, View } from 'react-native'
 import { apiCustomer } from '../../apis/apiDTHome'
 import { CircleComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import InputComponent from '../../components/InputComponent'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
 import { images } from '../../constants/images'
-import { useNavigation } from '@react-navigation/native'
 
-const CustomerScreen = ({ navigation }) => {
+const CustomerScreen = ({ navigation, route }) => {
   const [searchKey, setSearchKey] = useState('')
   const [dataCustomers, setDataCustomers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -72,10 +71,6 @@ const CustomerScreen = ({ navigation }) => {
     )
   }
 
-  const handleAddNewCustomer = () => {
-    Alert.alert('Thêm cus moi71F')
-  }
-
   return (
     <ContainerComponent>
       <HeaderComponent
@@ -101,7 +96,7 @@ const CustomerScreen = ({ navigation }) => {
         />
 
       </SectionComponent>
-      <FloatAddButtonComponent onPress={handleAddNewCustomer} />
+      <FloatAddButtonComponent onPress={() => navigation.navigate('AddNewCustomerScreen', { actionType: 'create' })} />
       <LoadingModalComponent visible={isLoading} />
     </ContainerComponent>
   )

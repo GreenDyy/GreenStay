@@ -12,6 +12,8 @@ import ButtonComponent from "./ButtonComponent";
 import AvatarGroupComponent from "./AvatarGroupComponent";
 import DrawerCustom from "./DrawerCustom";
 import LoadingModalComponent from "./LoadingModalComponent";
+import ImagePickerComponent from "./ImagePickerComponent";
+import CardComponent from "./CardComponent";
 
 export {
     TextComponent,
@@ -28,4 +30,6 @@ export {
     AvatarGroupComponent,
     DrawerCustom,
     LoadingModalComponent,
+    ImagePickerComponent,
+    CardComponent,
 }
