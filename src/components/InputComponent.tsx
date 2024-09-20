@@ -6,6 +6,7 @@ import RowComponent from './RowComponent'
 import SpaceComponent from './SpaceComponent'
 import TextComponent from './TextComponent'
 import { appFonts } from '../constants/appFonts'
+import { globalStyle } from '../styles/globalStyle'
 
 interface Props {
   allowClear: boolean
@@ -35,7 +36,7 @@ const InputComponent = (props: Props) => {
 
   return (
     <>
-      {title && (
+      {title &&
         <>
           <RowComponent style={{ justifyContent: 'flex-start' }}>
             <TextComponent text={title} fontFamily={appFonts.semiBoldOpenSans} />
@@ -43,17 +44,9 @@ const InputComponent = (props: Props) => {
           </RowComponent>
           <SpaceComponent height={8} />
         </>
-      )}
-      <View style={[
-        {
-          width: '100%',
-          minHeight: 50,
-          borderWidth: 1,
-          borderColor: appColors.gray3,
-          borderRadius: 8,
-          paddingHorizontal: 10
-        }
-      ]}>
+
+      }
+      <View style={[globalStyle.input]}>
         <RowComponent>
           <RowComponent style={{ justifyContent: 'flex-start', flex: 1 }}>
             {iconLeft}

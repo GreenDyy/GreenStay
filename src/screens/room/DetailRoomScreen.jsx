@@ -189,7 +189,13 @@ const DetailRoomScreen = ({ navigation, route }) => {
             <SectionComponent>
                 {/* trả phòng thì đổi trạng thái phòng, xuất bill, chuyển trạng thái rental */}
                 {
-                    dataRoom.isAvailable ? <ButtonComponent text='Cho thuê' onPress={() => { }} /> : <ButtonComponent text='Trả phòng' onPress={() => { }} />
+                    dataRoom.isAvailable
+                        ? <ButtonComponent text='Cho thuê' onPress={() => {
+                            navigation.navigate('Contract', {
+                                screen: 'AddContractScreen'
+                            })
+                        }} />
+                        : <ButtonComponent text='Trả phòng' onPress={() => { }} />
                 }
                 {
                     !dataRoom.isAvailable &&

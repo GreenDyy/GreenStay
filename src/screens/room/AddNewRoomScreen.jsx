@@ -100,6 +100,7 @@ const AddNewRoomScreen = ({ navigation, route }) => {
         description: "Thêm phòng thành công",
         type: "success",
       })
+      setDataRoom(initRoom)
       setIsLoading(false)
 
     }

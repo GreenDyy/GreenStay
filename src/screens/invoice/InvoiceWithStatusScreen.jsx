@@ -1,6 +1,6 @@
 import { View, Text, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { ContainerComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import { ContainerComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import { apiInvoice } from '../../apis/apiDTHome'
 
 const InvoiceWithStatusScreen = ({ navigation, route }) => {
@@ -45,6 +45,7 @@ const InvoiceWithStatusScreen = ({ navigation, route }) => {
                     keyExtractor={(item, index) => index.toString()}  // Sử dụng id nếu có
                 />
             </SectionComponent>
+            <LoadingModalComponent visible={isLoading}/>
         </ContainerComponent>
     )
 }

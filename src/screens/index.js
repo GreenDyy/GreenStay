@@ -13,6 +13,7 @@ import AddNewCustomerScreen from "./customer/AddNewCustomerScreen"
 import ContractScreen from "./contract/ContractScreen"
 import ContractWithStatusScreen from "./contract/ContractWithStatusScreen"
 import DetailContractScreen from "./contract/DetailContractScreen"
+import AddContractScreen from "./contract/AddContractScreen"
 //invoice
 import InvoidceScreen from "./invoice/InvoidceScreen"
 import InvoiceWithStatusScreen from "./invoice/InvoiceWithStatusScreen"
@@ -35,5 +36,6 @@ export {
     InvoidceScreen,
     InvoiceWithStatusScreen,
     ContractWithStatusScreen,
+    AddContractScreen,
 
 }

@@ -9,6 +9,7 @@ import { globalStyle } from '../styles/globalStyle'
 import CustomerNavigator from './CustomerNavigator'
 import HomeNavigator from './HomeNavigator'
 import RoomNavigator from './RoomNavigator'
+import TestScreen from '../screens/TestScreen'
 
 const BottomTabNavigator = () => {
     const Tab = createBottomTabNavigator()
@@ -71,7 +72,7 @@ const BottomTabNavigator = () => {
         })}>
             <Tab.Screen name='Trang chủ' component={HomeNavigator} />
             <Tab.Screen name='Phòng' component={RoomNavigator} />
-            <Tab.Screen name='Main' component={CustomerNavigator} />
+            <Tab.Screen name='Main' component={TestScreen} />
             <Tab.Screen name='Người thuê' component={CustomerNavigator} />
             <Tab.Screen name='Hoá đơn' component={RoomNavigator} />
 

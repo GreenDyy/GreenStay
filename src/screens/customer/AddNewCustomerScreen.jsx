@@ -28,7 +28,7 @@ const initCustomer = {
     "email": "",
     "phoneNumber": "",
     "photoUrl": "",
-    "dateOfBirth": new Date(),
+    "dateOfBirth": "",
     "citizenIdphotoFirstUrl": "",
     "citizenIdphotoBackUrl": "",
     "anotherPhotoUrl": "",
@@ -140,11 +140,17 @@ const AddNewCustomerScreen = ({ navigation, route }) => {
 
             await apiCustomer(url, newDataCustomer, 'post')
             navigation.navigate('CustomerScreen', { customerUpdate: true })
+            // navigation.reset({
+            //     index: 0,
+            //     routes: [{ name: 'Người thuê' }, { name: 'CustomerScreen', params: { customerUpdate: true } }],
+
+            // })
             showMessage({
                 message: "Thông báo",
                 description: "Thêm khách thành công",
                 type: "success",
             })
+            setDataCustomer(initCustomer)
             setIsLoading(false)
         }
         catch {

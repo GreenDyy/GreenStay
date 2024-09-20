@@ -28,16 +28,6 @@ const InvoidceScreen = ({ navigation, route }) => {
         }
     }
 
-    const renderInvoice = ({ item, index }) => {
-        return (
-            <RowComponent>
-                <TextComponent text={item.invoiceId} />
-                <TextComponent text={item.status} />
-                <TextComponent text={item.createAt} />
-            </RowComponent>
-        )
-    }
-
     return (
         <ContainerComponent>
             <HeaderComponent text='Danh sách hoá đơn' isBack />

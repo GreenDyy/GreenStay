@@ -38,10 +38,21 @@ export const globalStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    
+
     card: {
         padding: 12,
         borderRadius: 12,
         backgroundColor: appColors.white,
-      },
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    input: {
+        width: '100%',
+        minHeight: 50,
+        borderWidth: 1,
+        borderColor: appColors.gray3,
+        borderRadius: 8,
+        paddingHorizontal: 10,
+        justifyContent:'center'
+    }
 })

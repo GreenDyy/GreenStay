@@ -15,6 +15,7 @@ import LoadingModalComponent from "./LoadingModalComponent";
 import ImagePickerComponent from "./ImagePickerComponent";
 import CardComponent from "./CardComponent";
 import DateTimePickerComponent from "./DateTimePickerComponent";
+import DropDownComponent from "./DropDownComponent";
 
 export {
     TextComponent,
@@ -33,5 +34,6 @@ export {
     LoadingModalComponent,
     ImagePickerComponent,
     CardComponent,
-    DateTimePickerComponent
+    DateTimePickerComponent,
+    DropDownComponent,
 }
