@@ -47,7 +47,7 @@ const InputComponent = (props: Props) => {
       <View style={[
         {
           width: '100%',
-          height: 50,
+          minHeight: 50,
           borderWidth: 1,
           borderColor: appColors.gray3,
           borderRadius: 8,

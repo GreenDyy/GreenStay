@@ -25,13 +25,29 @@ axiosClient.interceptors.response.use(
 
     },
     (error) => {
-        console.error('API error:', error);
-        showMessage({
-            message: "Thông báo",
-            description: "Vui lòng kiểm tra kết nối mạng",
-            type: "danger",
-        })
-        return Promise.reject(error); // Đảm bảo lỗi được tiếp tục xử lý ở nơi gọi API
+        // Kiểm tra lỗi từ phản hồi
+        if (error.response) {
+            const { status } = error.response;
+            switch (status) {
+                case 404:
+                    break
+                case 500:
+                    showMessage({
+                        message: "Lỗi",
+                        description: "Đã xảy ra lỗi ở máy chủ",
+                        type: "danger",
+                    });
+                    break
+                default:
+                    showMessage({
+                        message: "Lỗi",
+                        description: "Đã xảy ra lỗi",
+                        type: "danger",
+                    });
+                    break
+            }
+            return Promise.reject(error); // Đảm bảo lỗi được tiếp tục xử lý ở nơi gọi API
+        }
     }
 )
 

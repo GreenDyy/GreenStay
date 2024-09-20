@@ -1,7 +1,7 @@
 import { Dimensions } from "react-native";
 
 //chạy ngrok http https://localhost:7095 để lấy public url
-const BASE_URL = 'https://f243-171-252-153-129.ngrok-free.app'
+const BASE_URL = 'https://cb1f-171-252-153-129.ngrok-free.app'
 // const BASE_URL = process.env.BASE_URL
 
 export const appInfors = {
@@ -13,5 +13,9 @@ export const appInfors = {
     monthNames: [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
+    ],
+    monthNamesVN: [
+        "Tháng Một", "Tháng Hai", "Tháng Ba", "Tháng Tư", "Tháng Năm", "Tháng Sáu",
+        "Tháng Bảy", "Tháng Tám", "Tháng Chín", "Tháng Mười", "Tháng Mười Một", "Tháng Mười Hai"
     ]
 }   

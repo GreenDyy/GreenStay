@@ -29,9 +29,41 @@ const apiMemberOfRental = async (url, data = null, method = 'get') => {
     })
 }
 
+const apiWater = async (url, data = null, method = 'get') => {
+    return await axiosClient(`/Water${url}`, {
+        method: method ?? 'get',
+        data,
+    })
+}
+
+const apiTrash = async (url, data = null, method = 'get') => {
+    return await axiosClient(`/apiTrash${url}`, {
+        method: method ?? 'get',
+        data,
+    })
+}
+
+const apiPower = async (url, data = null, method = 'get') => {
+    return await axiosClient(`/Power${url}`, {
+        method: method ?? 'get',
+        data,
+    })
+}
+
+const apiInvoice = async (url, data = null, method = 'get') => {
+    return await axiosClient(`/Invoice${url}`, {
+        method: method ?? 'get',
+        data,
+    })
+}
+
 export {
     apiRoom,
     apiCustomer,
     apiRental,
     apiMemberOfRental,
+    apiInvoice,
+    apiPower,
+    apiTrash,
+    apiWater,
 }

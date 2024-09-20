@@ -1,4 +1,4 @@
-import { ArrowCircleRight, SearchStatus } from 'iconsax-react-native'
+import { ArrowCircleRight, SearchStatus, ShopAdd } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
 import { FlatList, Image, View } from 'react-native'
 import { apiCustomer } from '../../apis/apiDTHome'
@@ -15,7 +15,8 @@ const CustomerScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     fetchDataCustomers()
-  }, [])
+    navigation.setParams({ customerUpdate: false })
+  }, [route.params?.customerUpdate])
 
   const fetchDataCustomers = async () => {
     setIsLoading(true)
@@ -76,6 +77,8 @@ const CustomerScreen = ({ navigation, route }) => {
       <HeaderComponent
         text='Người thuê'
         isBack
+        buttonRight={<ShopAdd size={22} color={appColors.primary}/>}
+        onRightPress={() => navigation.navigate('AddNewCustomerScreen', { actionType: 'create' })}
       />
       {/* search bar */}
       <SectionComponent>
@@ -93,6 +96,9 @@ const CustomerScreen = ({ navigation, route }) => {
           data={dataCustomers}
           renderItem={renderItemCustomer}
           keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={{ paddingBottom: 150 }}
+          showsVerticalScrollIndicator={false}
+
         />
 
       </SectionComponent>

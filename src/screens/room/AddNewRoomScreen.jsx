@@ -50,8 +50,9 @@ const AddNewRoomScreen = ({ navigation, route }) => {
 
   const upLoadImage = async () => {
     try {
+      const randomNum = Math.floor(Math.random() * (999 - 100 + 1)) + 100;
       const fileExtension = imageSelected.mime.split('/')[1]; // lấy phần đuôi tệp từ mime
-      const fileName = `room-${imageSelected.modificationDate}.${fileExtension}`;
+      const fileName = `${randomNum}${imageSelected.modificationDate}.${fileExtension}`;
       const pathFireBase = `images/rooms/${fileName}`;
 
       console.log('tên ảnh: ', fileName)
@@ -86,17 +87,20 @@ const AddNewRoomScreen = ({ navigation, route }) => {
     const url = '/create'
     setIsLoading(true)
     try {
-      const downloadURL = await upLoadImage();
-      if (downloadURL) {
-        handleChangeValue('photoUrl', downloadURL);
-        await apiRoom(url, { ...dataRoom, photoUrl: downloadURL }, 'post')
-        navigation.navigate('RoomScreen', { roomUpdate: true })
-        showMessage({
-          message: "Thông báo",
-          description: "Thêm phòng thành công",
-          type: "success",
-        })
+      let newDataRoom = { ...dataRoom }
+      if (imageSelected) {
+        const downloadURL = await upLoadImage();
+        newDataRoom = { ...dataRoom, photoUrl: downloadURL }
       }
+
+      await apiRoom(url, newDataRoom, 'post')
+      navigation.navigate('RoomScreen', { roomUpdate: true })
+      showMessage({
+        message: "Thông báo",
+        description: "Thêm phòng thành công",
+        type: "success",
+      })
+      setIsLoading(false)
 
     }
     catch {
@@ -105,24 +109,26 @@ const AddNewRoomScreen = ({ navigation, route }) => {
         description: "Thêm phòng thất bại",
         type: "danger",
       })
+      setIsLoading(false)
     }
   }
 
   const handleUpdateRoom = async () => {
     setIsLoading(true)
     try {
-
-      const downloadURL = await upLoadImage();
-      if (downloadURL) {
-        const newDataRoom = { ...dataRoom, photoUrl: downloadURL, updatedAt: new Date() }
-        await apiRoom(`/update/${roomId}`, newDataRoom, 'put')
-        navigation.navigate('RoomScreen', { roomUpdate: true })
-        showMessage({
-          message: "Thông báo",
-          description: "Sửa phòng thành công",
-          type: "success",
-        })
+      let newDataRoom = { ...dataRoom }
+      if (imageSelected) {
+        const downloadURL = await upLoadImage();
+        newDataRoom = { ...dataRoom, photoUrl: downloadURL, updatedAt: new Date() }
       }
+      await apiRoom(`/update/${roomId}`, newDataRoom, 'put')
+      navigation.navigate('RoomScreen', { roomUpdate: true })
+      showMessage({
+        message: "Thông báo",
+        description: "Sửa phòng thành công",
+        type: "success",
+      })
+      setIsLoading(false)
 
     }
     catch {
@@ -131,6 +137,7 @@ const AddNewRoomScreen = ({ navigation, route }) => {
         description: "Sửa phòng thất bại",
         type: "danger",
       })
+      setIsLoading(false)
     }
   }
 
@@ -150,15 +157,20 @@ const AddNewRoomScreen = ({ navigation, route }) => {
             setIsLoading(true);
             try {
 
-              try {
-                const fileRef = storage().refFromURL(dataRoom.photoUrl);
-                if (fileRef) {
-                  await fileRef.delete();
-                  console.log('Ảnh đã được xoá khỏi Firebase Storage');
+              // có ảnh thì mới xoá
+              if (dataRoom.photoUrl) {
+                try {
+                  const fileRef = storage().refFromURL(dataRoom.photoUrl);
+                  if (fileRef) {
+                    await fileRef.delete();
+                    console.log('Ảnh đã được xoá khỏi Firebase Storage');
+                  }
+                  setIsLoading(false)
                 }
-
-              } catch (error) {
-                console.error('Lỗi khi xoá ảnh: ', error);
+                catch (error) {
+                  console.error('Lỗi khi xoá ảnh: ', error);
+                  setIsLoading(false)
+                }
               }
 
               await apiRoom(`/delete/${roomId}`, {}, 'delete');
@@ -187,10 +199,16 @@ const AddNewRoomScreen = ({ navigation, route }) => {
 
   return (
     <ContainerComponent>
-      <HeaderComponent text={actionType === 'create' ? 'Thêm phòng mới' : 'Cập nhật phòng'} isBack
-        buttonRight={<Trash size={20} color={appColors.danger} />}
-        onRightPress={handleDeleteRoom}
-      />
+      {
+        actionType === 'create'
+          ?
+          <HeaderComponent text='Thêm phòng mới' isBack />
+          :
+          <HeaderComponent text='Cập nhật phòng' isBack
+            buttonRight={<Trash size={20} color={appColors.danger} />}
+            onRightPress={handleDeleteRoom}
+          />
+      }
 
       <SectionComponent>
         <ImagePickerComponent text={actionType === 'create' ? 'Thêm ảnh minh hoạ' : 'Thay đổi ảnh minh hoạ'} onSelect={(val) => { setImageSelected(val) }} />

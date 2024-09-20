@@ -1,4 +1,4 @@
-import { Grid2, Layer, SearchStatus } from 'iconsax-react-native';
+import { Category2, Grid2, Layer, SearchStatus } from 'iconsax-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { showMessage } from 'react-native-flash-message';
@@ -71,7 +71,7 @@ const RoomScreen = ({ navigation, route }) => {
     navigation.navigate('DetailRoomScreen', { roomId: roomId })
   }
 
-  const renderItemGrid = ({ item }) => {
+  const renderItemGrid = ({ item, index }) => {
     return (
       <TouchableOpacity style={[localStyle.cardRoom, globalStyle.shadow]}
         onPress={() => handleDetailRoom(item.roomId)}>
@@ -95,9 +95,9 @@ const RoomScreen = ({ navigation, route }) => {
 
   const renderItemList = ({ item }) => {
     return (
-      <TouchableOpacity onPress={() => handleDetailRoom(item.roomId)}>
+      <TouchableOpacity onPress={() => handleDetailRoom(item.roomId)} style={[localStyle.cardRoomList, globalStyle.shadow]}>
         <ImageBackground source={item.photoUrl ? { uri: item.photoUrl } : images.logo1} resizeMode='cover'
-          style={[globalStyle.shadow, localStyle.cardRoomList]}
+          style={{ flex: 1 }}
         >
           <LinearGradient
             colors={['rgba(0, 0, 0, 0.7)', 'rgba(0, 0, 0, 0)']} // Từ đen mờ đến trong suốt
@@ -133,7 +133,7 @@ const RoomScreen = ({ navigation, route }) => {
       <HeaderComponent
         text='Danh sách phòng'
         isBack
-        buttonRight={isGrid ? <Grid2 size={20} color={appColors.gray} /> : <Layer size={20} color={appColors.gray} />}
+        buttonRight={isGrid ? <Category2 size={22} color={appColors.gray} /> : <Layer size={20} color={appColors.gray} />}
         onRightPress={() => setIsGird(!isGrid)}
       />
 
@@ -153,7 +153,7 @@ const RoomScreen = ({ navigation, route }) => {
         data={dataRooms}
         renderItem={isGrid ? renderItemGrid : renderItemList}
         numColumns={isGrid ? 2 : 1}
-        columnWrapperStyle={isGrid ? { justifyContent: 'center' } : null}
+        columnWrapperStyle={isGrid ? { justifyContent: 'center', paddingHorizontal: 8 } : null}
         contentContainerStyle={{ paddingBottom: 70 }}
         keyExtractor={(item, index) => index.toString()}
         initialNumToRender={6}
@@ -173,7 +173,8 @@ const localStyle = StyleSheet.create({
     borderWidth: 1,
     borderColor: appColors.gray2,
     height: 220,
-    width: appInfors.sizes.WIDTH * 0.43,
+    // width: appInfors.sizes.WIDTH * 0.43,
+    flex: 1,
     marginTop: 0,
     marginBottom: 14,
     marginHorizontal: 10,
@@ -183,13 +184,13 @@ const localStyle = StyleSheet.create({
   },
 
   cardRoomList: {
-    height: 90,
+    height: 100,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 14,
     backgroundColor: appColors.white,
     marginHorizontal: 16,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   gradientOverlay: {
     position: 'absolute',

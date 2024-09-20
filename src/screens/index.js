@@ -9,6 +9,14 @@ import AddNewRoomScreen from "./room/AddNewRoomScreen"
 import DetailRoomScreen from "./room/DetailRoomScreen"
 import DetailCustomerScreen from "./customer/DetailCustomerScreen"
 import AddNewCustomerScreen from "./customer/AddNewCustomerScreen"
+//contract
+import ContractScreen from "./contract/ContractScreen"
+import ContractWithStatusScreen from "./contract/ContractWithStatusScreen"
+import DetailContractScreen from "./contract/DetailContractScreen"
+//invoice
+import InvoidceScreen from "./invoice/InvoidceScreen"
+import InvoiceWithStatusScreen from "./invoice/InvoiceWithStatusScreen"
+
 
 export {
     HomeScreen,
@@ -22,5 +30,10 @@ export {
     DetailRoomScreen,
     DetailCustomerScreen,
     AddNewCustomerScreen,
+    ContractScreen,
+    DetailContractScreen,
+    InvoidceScreen,
+    InvoiceWithStatusScreen,
+    ContractWithStatusScreen,
 
 }

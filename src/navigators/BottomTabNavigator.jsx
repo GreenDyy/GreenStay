@@ -1,14 +1,14 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { Building3, DocumentText, Home2, House2, People, ScanBarcode } from 'iconsax-react-native'
+import { Building3, DocumentText, House2, People, ScanBarcode } from 'iconsax-react-native'
 import React from 'react'
+import { View } from 'react-native'
 import { CircleComponent, TextComponent } from '../components'
 import { appColors } from '../constants/appColors'
 import { appFonts } from '../constants/appFonts'
+import { globalStyle } from '../styles/globalStyle'
 import CustomerNavigator from './CustomerNavigator'
 import HomeNavigator from './HomeNavigator'
 import RoomNavigator from './RoomNavigator'
-import { Image, View } from 'react-native'
-import { globalStyle } from '../styles/globalStyle'
 
 const BottomTabNavigator = () => {
     const Tab = createBottomTabNavigator()
