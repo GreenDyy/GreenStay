@@ -56,7 +56,7 @@ const CustomerScreen = ({ navigation, route }) => {
           justifyContent: 'flex-start'
         }}>
           <CircleComponent>
-            <Image source={item.photoUrl ? { uri: item?.photoUrl } : images.logo1} style={{ height: 40, width: 40 }} resizeMode='cover' />
+            <Image source={item.photoUrl ? { uri: item?.photoUrl } : images.avatar_null} style={{ height: 40, width: 40 }} resizeMode='cover' />
           </CircleComponent>
           <SpaceComponent width={10} />
           <View>

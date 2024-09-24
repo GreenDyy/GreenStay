@@ -86,6 +86,17 @@ const AddNewRoomScreen = ({ navigation, route }) => {
   const handleCreateNewRoom = async () => {
     const url = '/create'
     setIsLoading(true)
+
+    if (!dataRoom.roomName || !dataRoom.roomPrice) {
+      showMessage({
+        message: 'Thông báo',
+        description: 'Vui lòng nhập đủ thông tin',
+        type: 'warning'
+      })
+      setIsLoading(false)
+      return
+    }
+
     try {
       let newDataRoom = { ...dataRoom }
       if (imageSelected) {

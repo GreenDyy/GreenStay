@@ -7,6 +7,8 @@ import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
 import { images } from '../../constants/images'
 import { globalStyle } from '../../styles/globalStyle'
+import { Text } from 'react-native-svg'
+import { checkNamNhuan, getDate } from '../../utils/Utils'
 
 const initRoom = {
     "roomId": 1,
@@ -26,6 +28,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
     const { roomId } = route.params
     const [dataRoom, setDataRoom] = useState(initRoom)
     const [dataCustomers, setDataCustomers] = useState([])
+    const [startDate, setStartDate] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
@@ -34,6 +37,20 @@ const DetailRoomScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         fetchDataMemberOfRoom()
+    }, [dataRoom])
+
+    useEffect(() => {
+        console.log('rental get-by-room:', startDate)
+    }, [startDate])
+
+    useEffect(() => {
+        const fetchRental = async () => {
+            const res = await apiRental(`/get-by-room-and-status/${roomId}/true`)
+            if (res && res.startDate) {
+                setStartDate(new Date(res.startDate));
+            }
+        }
+        fetchRental()
     }, [dataRoom])
 
     const fetchDataRoom = async () => {
@@ -87,7 +104,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
                     justifyContent: 'flex-start'
                 }}>
                     <CircleComponent>
-                        <Image source={item.photoUrl ? { uri: item?.photoUrl } : images.logo1} style={{ height: 40, width: 40 }} resizeMode='cover' />
+                        <Image source={item.photoUrl ? { uri: item?.photoUrl } : images.avatar_null} style={{ height: 40, width: 40 }} resizeMode='cover' />
                     </CircleComponent>
                     <SpaceComponent width={10} />
                     <View>
@@ -102,6 +119,49 @@ const DetailRoomScreen = ({ navigation, route }) => {
             </RowComponent>
         )
     }
+
+    const checkMonthlyBilling = (startDate) => {
+        const start = new Date('2024-09-21'); // Ngày bắt đầu trong hợp đồng
+        const today = new Date('2024-10-21'); // Ngày hiện tại
+
+        const yearDifference = today.getFullYear() - start.getFullYear();
+        const monthDifference = today.getMonth() - start.getMonth();
+
+        // Tính tổng chênh lệch tháng
+        const totalMonthDifference = yearDifference * 12 + monthDifference;
+
+        // Nếu chỉ cách nhau 1 tháng
+        if (totalMonthDifference === 1) {
+            if (today.getDate() >= start.getDate()) {
+                console.log('Đã tới ngày thu tiền');
+            }
+            else if (today.getMonth() + 1 === 2) { // Kiểm tra tháng 2
+                const lastDayOfFebruary = checkNamNhuan(today.getFullYear()) ? 29 : 28;
+
+                if (today.getDate() === lastDayOfFebruary) {
+                    console.log('Đã tới ngày thu tiền');
+                } else {
+                    console.log('Chưa tới ngày thu tiền');
+                }
+            }
+            else if ([4, 6, 9, 11].includes(today.getMonth() + 1)) { // Kiểm tra các tháng có 30 ngày
+                if (today.getDate() === 30) {
+                    console.log('Đã tới ngày thu tiền');
+                } else {
+                    console.log('Chưa tới ngày thu tiền');
+                }
+            }
+            else {
+                console.log('Chưa tới ngày thu tiền');
+            }
+        }
+        else if (totalMonthDifference >= 2) {
+            console.log('Đã tới ngày thu tiền');
+        }
+        else {
+            console.log('Chưa tới ngày thu tiền');
+        }
+    };
 
     return (
         <ContainerComponent isScroll>
@@ -190,20 +250,31 @@ const DetailRoomScreen = ({ navigation, route }) => {
                 {/* trả phòng thì đổi trạng thái phòng, xuất bill, chuyển trạng thái rental */}
                 {
                     dataRoom.isAvailable
-                        ? <ButtonComponent text='Cho thuê' onPress={() => {
-                            navigation.navigate('Contract', {
-                                screen: 'AddContractScreen'
-                            })
-                        }} />
-                        : <ButtonComponent text='Trả phòng' onPress={() => { }} />
+                    && <ButtonComponent text='Cho thuê' onPress={() => {
+                        navigation.navigate('Contract', {
+                            screen: 'AddContractScreen',
+                            params: {
+                                roomId: roomId
+                            }
+                        })
+                    }} />
                 }
+
                 {
                     !dataRoom.isAvailable &&
                     <View>
                         <TextComponent text='Ngày thuê so với ngày hiện tại, nếu mà đúng ngày của tháng mới thì cho nút tính tiền hiện lên' />
-                        <ButtonComponent text='Thanh toán tiền tháng' onPress={() => { }} />
+                        <ButtonComponent text='Thanh toán tiền tháng' onPress={() => { checkMonthlyBilling(startDate) }} />
                     </View>
+
+
+
                 }
+                <RowComponent>
+                    <TextComponent text={getDate(startDate)} />
+                    <TextComponent text={getDate(new Date())} />
+
+                </RowComponent>
             </SectionComponent>
             <LoadingModalComponent visible={isLoading} />
         </ContainerComponent>

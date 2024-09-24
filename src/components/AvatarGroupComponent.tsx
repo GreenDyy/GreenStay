@@ -3,6 +3,7 @@ import React from 'react'
 import RowComponent from './RowComponent'
 import CircleComponent from './CircleComponent'
 import { appColors } from '../constants/appColors'
+import { images } from '../constants/images'
 
 interface Props {
     size?: number
@@ -24,7 +25,7 @@ const AvatarGroupComponent = (props: Props) => {
                         marginLeft: index !== 0 ? -10 : 0,
                         zIndex: 10 - index
                     }}>
-                        <Image source={{ uri: item.photoUrl }} resizeMode='cover' style={{ height: size ?? 24, width: size ?? 24 }} />
+                        <Image source={item.photoUrl ? { uri: item.photoUrl } : images.avatar_null} resizeMode='cover' style={{ height: size ?? 24, width: size ?? 24 }} />
                     </CircleComponent>
                 )
             })}

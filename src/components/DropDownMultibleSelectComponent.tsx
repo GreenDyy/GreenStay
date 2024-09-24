@@ -7,9 +7,11 @@ import { globalStyle } from '../styles/globalStyle';
 import RowComponent from './RowComponent';
 import SpaceComponent from './SpaceComponent';
 import TextComponent from './TextComponent';
+import ButtonComponent from './ButtonComponent';
+import SectionComponent from './SectionComponent';
 
 interface Props {
-    onSelect: (val: any) => void;
+    onSelect: (val: any[]) => void;
     data: [{
         label: any
         value: any
@@ -22,17 +24,35 @@ interface Props {
         value: any
         photoUrl: string
     }, index: number) => ReactNode
-    enable?: boolean
 }
 
-const DropDownComponent = (props: Props) => {
-    const { onSelect, data, selected, title, renderItem, enable } = props;
+const DropDownMultibleSelectComponent = (props: Props) => {
+    const { onSelect, data, selected, title, renderItem } = props;
     const [isShowDropdown, setIsShowDropdown] = useState(false);
+    const [listValue, setListValue] = useState<any[]>([]);
 
-    const handleSelect = (item: any) => {
-        onSelect(item);
-        setIsShowDropdown(false);
-    };
+    //id là value đó tui ghi z
+    const handleSelectMultible = (id: any) => {
+        let updatedList = [...listValue];
+        if (listValue.includes(id)) {
+            //tìm vị trí cần xoá
+            const index = updatedList.findIndex(value => value === id)
+            //xoá
+            updatedList.splice(index, 1)
+
+        }
+        else {
+            updatedList.push(id)
+        }
+        setListValue(updatedList);
+        onSelect(updatedList);
+    }
+
+    const handleConfirmSelected = () => {
+        onSelect(listValue)
+        setIsShowDropdown(false)
+    }
+
     return (
         <View style={{ position: 'relative' }}>
             {title &&
@@ -42,30 +62,32 @@ const DropDownComponent = (props: Props) => {
                     </RowComponent>
                     <SpaceComponent height={8} />
                 </>
-
             }
             <TouchableOpacity
                 style={[globalStyle.input]}
                 onPress={() => setIsShowDropdown(!isShowDropdown)}
-                disabled={enable ?? false}
             >
                 <RowComponent>
-                    <TextComponent text={selected ?? 'Chọn'} />
+                    <TextComponent flex={1} text={selected ?? 'Chọn'}/>
                     {isShowDropdown ? <ArrowUp2 size={22} color={appColors.text} /> : <ArrowDown2 size={22} color={appColors.text} />}
                 </RowComponent>
             </TouchableOpacity>
-
             {isShowDropdown && (
                 <View style={[styles.dropdown, globalStyle.shadow]}>
                     <FlatList
                         data={data}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({ item, index }) => (
-                            <TouchableOpacity onPress={() => handleSelect(item.value)}  >
+                            <TouchableOpacity onPress={() => handleSelectMultible(item.value)} >
                                 {renderItem(item, index)}
                             </TouchableOpacity>
                         )}
                     />
+                    <SpaceComponent height={30} />
+                    <SectionComponent>
+
+                        <ButtonComponent text='Đóng' onPress={handleConfirmSelected} />
+                    </SectionComponent>
                 </View>
             )}
         </View>
@@ -80,9 +102,9 @@ const styles = StyleSheet.create({
         right: '0%',
         backgroundColor: 'white',
         borderRadius: 5,
-        maxHeight: 180,
-        zIndex: 1000
+        maxHeight: 300,
+        zIndex: 1000,
     },
 });
 
-export default DropDownComponent;
+export default DropDownMultibleSelectComponent;

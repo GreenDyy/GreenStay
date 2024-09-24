@@ -16,6 +16,7 @@ import ImagePickerComponent from "./ImagePickerComponent";
 import CardComponent from "./CardComponent";
 import DateTimePickerComponent from "./DateTimePickerComponent";
 import DropDownComponent from "./DropDownComponent";
+import DropDownMultibleSelectComponent from "./DropDownMultibleSelectComponent";
 
 export {
     TextComponent,
@@ -36,4 +37,5 @@ export {
     CardComponent,
     DateTimePickerComponent,
     DropDownComponent,
+    DropDownMultibleSelectComponent
 }

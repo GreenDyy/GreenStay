@@ -123,43 +123,55 @@ const AddNewCustomerScreen = ({ navigation, route }) => {
     const handleCreateNewCustomer = async () => {
         const url = '/create'
         setIsLoading(true)
-        try {
-            let newDataCustomer = { ...dataCustomer }
-            if (imageSelected) {
-                const avatarUrl = await upLoadImage(imageSelected);
-                newDataCustomer = { ...dataCustomer, photoUrl: avatarUrl }
-            }
-            if (imageSelected2) {
-                const cccdFontUrl = await upLoadImage(imageSelected2);
-                newDataCustomer = { ...dataCustomer, citizenIdphotoFirstUrl: cccdFontUrl }
-            }
-            if (imageSelected3) {
-                const cccdBackUrl = await upLoadImage(imageSelected3);
-                newDataCustomer = { ...dataCustomer, citizenIdphotoBackUrl: cccdBackUrl }
-            }
-
-            await apiCustomer(url, newDataCustomer, 'post')
-            navigation.navigate('CustomerScreen', { customerUpdate: true })
-            // navigation.reset({
-            //     index: 0,
-            //     routes: [{ name: 'Người thuê' }, { name: 'CustomerScreen', params: { customerUpdate: true } }],
-
-            // })
+        //check validate
+        if (!dataCustomer.customerName || !dataCustomer.email || !dataCustomer.phoneNumber || !dataCustomer.citizenId || !dataCustomer.dateOfBirth) {
             showMessage({
-                message: "Thông báo",
-                description: "Thêm khách thành công",
-                type: "success",
+                message: 'Thông báo',
+                description: 'Vui lòng nhập đủ thông tin',
+                type: 'warning'
             })
-            setDataCustomer(initCustomer)
             setIsLoading(false)
+            return
         }
-        catch {
-            showMessage({
-                message: "Thông báo",
-                description: "Thêm khách thất bại",
-                type: "danger",
-            })
-            setIsLoading(false)
+        else {
+            try {
+                let newDataCustomer = { ...dataCustomer }
+                if (imageSelected) {
+                    const avatarUrl = await upLoadImage(imageSelected);
+                    newDataCustomer = { ...dataCustomer, photoUrl: avatarUrl }
+                }
+                if (imageSelected2) {
+                    const cccdFontUrl = await upLoadImage(imageSelected2);
+                    newDataCustomer = { ...dataCustomer, citizenIdphotoFirstUrl: cccdFontUrl }
+                }
+                if (imageSelected3) {
+                    const cccdBackUrl = await upLoadImage(imageSelected3);
+                    newDataCustomer = { ...dataCustomer, citizenIdphotoBackUrl: cccdBackUrl }
+                }
+
+                await apiCustomer(url, newDataCustomer, 'post')
+                navigation.navigate('CustomerScreen', { customerUpdate: true })
+                // navigation.reset({
+                //     index: 0,
+                //     routes: [{ name: 'Người thuê' }, { name: 'CustomerScreen', params: { customerUpdate: true } }],
+
+                // })
+                showMessage({
+                    message: "Thông báo",
+                    description: "Thêm khách thành công",
+                    type: "success",
+                })
+                setDataCustomer(initCustomer)
+                setIsLoading(false)
+            }
+            catch {
+                showMessage({
+                    message: "Thông báo",
+                    description: "Thêm khách thất bại",
+                    type: "danger",
+                })
+                setIsLoading(false)
+            }
         }
     }
 

@@ -40,7 +40,7 @@ const TextComponent = (props: Props) => {
                 },
                 style,
             ]}
-            numberOfLines={numberOfLines}
+            numberOfLines={1 ?? numberOfLines}
         >
             {text}
         </Text>
