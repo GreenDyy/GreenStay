@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
-import { InvoidceScreen } from '../screens'
+import { AddInvoiceScreen, InvoidceScreen } from '../screens'
 
 // thằng này con của HomeNavigator
 const InvoiceNavigator = () => {
@@ -10,6 +10,7 @@ const InvoiceNavigator = () => {
             headerShown: false
         }}>
             <Stack.Screen name='InvoiceScreen' component={InvoidceScreen} />
+            <Stack.Screen name='AddInvoiceScreen' component={AddInvoiceScreen} />
         </Stack.Navigator>
     )
 }

@@ -262,10 +262,14 @@ const DetailRoomScreen = ({ navigation, route }) => {
 
                 {
                     !dataRoom.isAvailable &&
-                    <View>
-                        <TextComponent text='Ngày thuê so với ngày hiện tại, nếu mà đúng ngày của tháng mới thì cho nút tính tiền hiện lên' />
-                        <ButtonComponent text='Thanh toán tiền tháng' onPress={() => { checkMonthlyBilling(startDate) }} />
-                    </View>
+                    // <View>
+                    //     <TextComponent text='Ngày thuê so với ngày hiện tại, nếu mà đúng ngày của tháng mới thì cho nút tính tiền hiện lên' />
+                    //     <ButtonComponent text='Thanh toán tiền tháng' onPress={() => { checkMonthlyBilling(startDate) }} />
+                    // </View>
+                    <ButtonComponent text='Tạo hoá đơn thu tiền' onPress={()=>{navigation.navigate('Invoice', {
+                        screen: 'AddInvoiceScreen',
+                        params: {roomId: roomId}
+                    })}}/>
 
 
 

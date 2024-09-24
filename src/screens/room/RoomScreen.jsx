@@ -58,7 +58,7 @@ const RoomScreen = ({ navigation, route }) => {
       setDataRooms(newDataRooms)
       setIsLoading(false)
     } catch (error) {
-      console.error('Lỗi api:', error);
+      console.error('Lỗi api khi fetch data rooms:', error);
       setIsLoading(false)
     }
   }

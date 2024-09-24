@@ -31,6 +31,20 @@ axiosClient.interceptors.response.use(
             switch (status) {
                 case 404:
                     break
+                case 400:
+                    showMessage({
+                        message: "Lỗi 400",
+                        description: "Đã xảy ra lỗi BadRequest",
+                        type: "danger",
+                    });
+                    break
+                case 403:
+                    showMessage({
+                        message: "Lỗi 403",
+                        description: "Đã xảy ra lỗi Forbidden liên quan đến quyền truy cập",
+                        type: "danger",
+                    });
+                    break
                 case 500:
                     showMessage({
                         message: "Lỗi",

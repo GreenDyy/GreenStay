@@ -14,7 +14,6 @@ const initContract = {
 }
 
 const AddContractScreen = ({ navigation, route }) => {
-    const { roomId } = route.params
     const [isLoading, setIsLoading] = useState(false)
     const [isFormValid, setIsFormValid] = useState(false)
     const [contract, setContract] = useState(initContract)
@@ -31,17 +30,18 @@ const AddContractScreen = ({ navigation, route }) => {
     const [waterStart, setWaterStart] = useState('')
     const [powerStart, setPowerStart] = useState('')
 
+    //lấy roomId lun nếu nó dc truyền từ màn khác
+    useEffect(() => {
+        if (route.params?.roomId) {
+            handleChangeValue('roomId', route.params?.roomId)
+        }
+    }, [route.params?.roomId])
+
     useEffect(() => {
         fetchDataRoomAvailables()
         fetchDataCustomers()
     }, [])
-    //lấy roomId lun nếu nó dc truyền từ màn khác
-    useEffect(() => {
-        if (roomId) {
-            setContract({ ...contract, roomId: roomId })
-            console.log('room id ban đầu: ', roomId)
-        }
-    }, [roomId])
+
 
     //khi có id người dại điện thì fetch cái này
     useEffect(() => {
