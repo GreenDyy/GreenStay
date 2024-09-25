@@ -1,19 +1,20 @@
 import { Book, Check, TickCircle } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
-import { Image } from 'react-native'
+import { Image, Modal } from 'react-native'
 import { apiCustomer, apiMemberOfRental, apiRental, apiRoom } from '../../apis/apiDTHome'
 import { ButtonComponent, CircleComponent, ContainerComponent, DropDownComponent, DropDownMultibleSelectComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import InputComponent from '../../components/InputComponent'
 import { appColors } from '../../constants/appColors'
 import { showMessage } from 'react-native-flash-message'
 import { images } from '../../constants/images'
+import AddNewCustomerModal from '../customer/AddNewCustomerModal'
 //các bảng sẽ tương tác: Rental, Customer maybe, Room, MemberOfRental
 
 const initContract = {
 
 }
 
-const AddContractScreen = ({ navigation, route }) => {
+const AddContractModal = ({ visible, onClose, roomId }) => {
     const [isLoading, setIsLoading] = useState(false)
     const [isFormValid, setIsFormValid] = useState(false)
     const [contract, setContract] = useState(initContract)
@@ -30,18 +31,25 @@ const AddContractScreen = ({ navigation, route }) => {
     const [waterStart, setWaterStart] = useState('')
     const [powerStart, setPowerStart] = useState('')
 
+    const [isShowModalCustomerAdd, setIsShowModalCustomerAdd] = useState(false)
+
     //lấy roomId lun nếu nó dc truyền từ màn khác
     useEffect(() => {
-        if (route.params?.roomId) {
-            handleChangeValue('roomId', route.params?.roomId)
+        if (roomId) {
+            handleChangeValue('roomId', roomId)
         }
-    }, [route.params?.roomId])
+    }, [roomId])
 
+    //load ds phòng
     useEffect(() => {
         fetchDataRoomAvailables()
-        fetchDataCustomers()
     }, [])
 
+    //load ds khách hàng chưa thuê phòng nào (check xem trong các rental hiện tại và memberofrenral)
+    useEffect(() => {
+        if (!isShowModalCustomerAdd)
+            fetchDataCustomers()
+    }, [isShowModalCustomerAdd])
 
     //khi có id người dại điện thì fetch cái này
     useEffect(() => {
@@ -243,18 +251,7 @@ const AddContractScreen = ({ navigation, route }) => {
                         isAvailable: false,
                         updatedAt: new Date()
                     }
-                    const roomUpdateRes = await apiRoom(`/update/${contract.roomId}`, newDataRoom, 'put')
-                    console.log('room khi rental: ', newDataRoom)
-                    if (roomUpdateRes) {
-                        navigation.navigate('RoomScreen', { roomUpdate: true })
-                        console.log('Tạo phiếu thuê thành công')
-                        showMessage({
-                            message: 'Thông báo',
-                            description: 'Tạo phiếu thuê thành công',
-                            type: 'success'
-                        })
-                    }
-
+                    await apiRoom(`/update/${contract.roomId}`, newDataRoom, 'put')
                     //B3: thêm vào MemberOfRental
                     const listRentalId = await apiRental(`/get-all`)
                     const lastRentalId = listRentalId[listRentalId.length - 1].rentalId
@@ -268,17 +265,22 @@ const AddContractScreen = ({ navigation, route }) => {
                         await apiMemberOfRental(`/create`, dataMember, 'post')
                     }
 
-
                     showMessage({
                         message: 'Thông báo',
                         description: 'Tạo phiếu thuê thành công',
                         type: 'success'
                     })
                     setIsLoading(false)
+                    onClose()
                 }
 
             }
             catch (e) {
+                showMessage({
+                    message: 'Thông báo',
+                    description: 'Tạo phiếu thuê thất bại',
+                    type: 'danger'
+                })
                 setIsLoading(false)
                 console.log('Lỗi khi cố tạo 1 contract:', e)
             }
@@ -286,69 +288,72 @@ const AddContractScreen = ({ navigation, route }) => {
     }
 
     return (
-        <ContainerComponent>
-            <HeaderComponent text='Tạo hợp đồng thuê' isBack />
+        <Modal visible={visible}>
+            <ContainerComponent>
+                <HeaderComponent text='Tạo hợp đồng thuê' isBack customIsBack={onClose} />
 
-            <SectionComponent>
-                {/* //dropdown nè */}
-                <DropDownComponent title='Phòng'
-                    //data sẽ dc lấy từ danh sách các khách chọn ở trên nhen
-                    data={dropDownRooms}
-                    onSelect={(value) => handleChangeValue('roomId', value)}
-                    renderItem={(item, index) => renderItemDropDown(item, index)}
-                    selected={contract.roomId || 'Chọn phòng'}
-                />
+                <SectionComponent>
+                    {/* //dropdown nè */}
+                    <DropDownComponent title='Phòng'
+                        //data sẽ dc lấy từ danh sách các khách chọn ở trên nhen
+                        data={dropDownRooms}
+                        onSelect={(value) => handleChangeValue('roomId', value)}
+                        renderItem={(item, index) => renderItemDropDown(item, index)}
+                        selected={contract.roomId || 'Chọn phòng'}
+                    />
 
-                <SpaceComponent height={14} />
+                    <SpaceComponent height={14} />
 
-                <DropDownMultibleSelectComponent title='Chọn các khách hàng'
-                    data={dropDownCustomers}
-                    onSelect={(value) => { setListMemberSelected(value) }
-                    }
-                    renderItem={(item, index) => renderItemDropDownMultible(item, index)}
-                    selected={memberNames.join(', ') || 'Chọn khách hàng'}
-                />
+                    <DropDownMultibleSelectComponent title='Chọn các khách hàng'
+                        data={dropDownCustomers}
+                        onSelect={(value) => { setListMemberSelected(value) }
+                        }
+                        renderItem={(item, index) => renderItemDropDownMultible(item, index)}
+                        selected={memberNames.join(', ') || 'Chọn khách hàng'}
+                    />
 
-                <SpaceComponent height={14} />
-                <ButtonComponent text='Thêm khách hàng mới' type='link' onPress={() => { navigation.navigate('Người thuê', { screen: 'AddNewCustomerScreen', params: { actionType: 'create' } }) }} />
-                <SpaceComponent height={14} />
+                    <SpaceComponent height={14} />
+                    <ButtonComponent text='Thêm khách hàng mới' type='link' onPress={() => { setIsShowModalCustomerAdd(true) }} />
+                    <SpaceComponent height={14} />
 
-                <InputComponent
-                    title='Số điện đầu kỳ (Xem trên công tơ)'
-                    value={powerStart}
-                    placeholder='Nhập số điện đầu kỳ'
-                    allowClear
-                    keyboardType='number-pad'
-                    onChangeText={(val) => { setPowerStart(val) }}
-                />
-                <SpaceComponent height={14} />
-                <InputComponent
-                    title='Số nước đầu kỳ (Xem trên công tơ)'
-                    value={waterStart}
-                    placeholder='Nhập số nước đầu kỳ'
-                    allowClear
-                    keyboardType='number-pad'
-                    onChangeText={(val) => { setWaterStart(val) }}
-                />
-                <SpaceComponent height={14} />
-                {/* //dropdown nè */}
-                <DropDownComponent enable={listMemberSelected.length !== 0 ? false : true} title='Chọn người đại diện'
-                    //data sẽ dc lấy từ danh sách các khách chọn ở trên nhen
-                    data={dropDownRepresentatives}
-                    onSelect={(value) => handleChangeValue('customerId', value)}
-                    renderItem={(item, index) => renderItemDropDown(item, index)}
-                    selected={representative?.customerName || 'Chọn người đại diện'}
-                />
-                <SpaceComponent height={14} />
-            </SectionComponent>
+                    <InputComponent
+                        title='Số điện đầu kỳ (Xem trên công tơ)'
+                        value={powerStart}
+                        placeholder='Nhập số điện đầu kỳ'
+                        allowClear
+                        keyboardType='number-pad'
+                        onChangeText={(val) => { setPowerStart(val) }}
+                    />
+                    <SpaceComponent height={14} />
+                    <InputComponent
+                        title='Số nước đầu kỳ (Xem trên công tơ)'
+                        value={waterStart}
+                        placeholder='Nhập số nước đầu kỳ'
+                        allowClear
+                        keyboardType='number-pad'
+                        onChangeText={(val) => { setWaterStart(val) }}
+                    />
+                    <SpaceComponent height={14} />
+                    {/* //dropdown nè */}
+                    <DropDownComponent enable={listMemberSelected.length !== 0 ? false : true} title='Chọn người đại diện'
+                        //data sẽ dc lấy từ danh sách các khách chọn ở trên nhen
+                        data={dropDownRepresentatives}
+                        onSelect={(value) => handleChangeValue('customerId', value)}
+                        renderItem={(item, index) => renderItemDropDown(item, index)}
+                        selected={representative?.customerName || 'Chọn người đại diện'}
+                    />
+                    <SpaceComponent height={14} />
+                </SectionComponent>
 
-            <SectionComponent>
-                <ButtonComponent text='Tạo hợp đồng' onPress={handleCreateContract} />
-            </SectionComponent>
+                <SectionComponent>
+                    <ButtonComponent text='Tạo hợp đồng' onPress={handleCreateContract} />
+                </SectionComponent>
 
-            <LoadingModalComponent visible={isLoading} />
-        </ContainerComponent>
+                <AddNewCustomerModal visible={isShowModalCustomerAdd} onClose={() => { setIsShowModalCustomerAdd(false) }} actionType={'create'} />
+                <LoadingModalComponent visible={isLoading} />
+            </ContainerComponent>
+        </Modal>
     )
 }
 
-export default AddContractScreen
+export default AddContractModal

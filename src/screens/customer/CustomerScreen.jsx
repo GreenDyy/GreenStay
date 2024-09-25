@@ -7,16 +7,27 @@ import InputComponent from '../../components/InputComponent'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
 import { images } from '../../constants/images'
+import AddNewCustomerModal from './AddNewCustomerModal'
 
 const CustomerScreen = ({ navigation, route }) => {
   const [searchKey, setSearchKey] = useState('')
   const [dataCustomers, setDataCustomers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isShowModalAdd, setIsShowModalAdd] = useState(false)
 
   useEffect(() => {
-    fetchDataCustomers()
-    navigation.setParams({ customerUpdate: false })
-  }, [route.params?.customerUpdate])
+    if (!isShowModalAdd) {
+      fetchDataCustomers()
+    }
+  }, [isShowModalAdd])
+
+  useEffect(() => {
+    const reFetchData = navigation.addListener('focus', () => {
+      fetchDataCustomers(); // Cập nhật dữ liệu khi quay lại màn hình
+    });
+
+    return reFetchData;
+  }, []);
 
   const fetchDataCustomers = async () => {
     setIsLoading(true)
@@ -77,7 +88,7 @@ const CustomerScreen = ({ navigation, route }) => {
       <HeaderComponent
         text='Người thuê'
         isBack
-        buttonRight={<ShopAdd size={22} color={appColors.primary}/>}
+        buttonRight={<ShopAdd size={22} color={appColors.primary} />}
         onRightPress={() => navigation.navigate('AddNewCustomerScreen', { actionType: 'create' })}
       />
       {/* search bar */}
@@ -102,7 +113,8 @@ const CustomerScreen = ({ navigation, route }) => {
         />
 
       </SectionComponent>
-      <FloatAddButtonComponent onPress={() => navigation.navigate('AddNewCustomerScreen', { actionType: 'create' })} />
+      <FloatAddButtonComponent onPress={() => { setIsShowModalAdd(true) }} />
+      <AddNewCustomerModal visible={isShowModalAdd} onClose={() => setIsShowModalAdd(false)} actionType={'create'} />
       <LoadingModalComponent visible={isLoading} />
     </ContainerComponent>
   )

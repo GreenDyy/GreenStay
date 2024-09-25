@@ -1,4 +1,4 @@
-import { View, Text, Image, Alert } from 'react-native'
+import { View, Text, Image, Alert, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { ButtonComponent, ContainerComponent, HeaderComponent, ImagePickerComponent, LoadingModalComponent, SectionComponent, SpaceComponent } from '../../components'
 import InputComponent from '../../components/InputComponent'
@@ -7,6 +7,7 @@ import { showMessage } from 'react-native-flash-message'
 import { appColors } from '../../constants/appColors'
 import { Trash } from 'iconsax-react-native'
 import storage from '@react-native-firebase/storage';
+import { useNavigation } from '@react-navigation/native'
 
 const initRoom = {
   roomName: '',
@@ -17,11 +18,11 @@ const initRoom = {
   updatedAt: new Date(),
 }
 
-const AddNewRoomScreen = ({ navigation, route }) => {
-  const { roomId, actionType } = route.params
+const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
   const [dataRoom, setDataRoom] = useState(initRoom)
   const [imageSelected, setImageSelected] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const navigation = useNavigation()
 
   useEffect(() => {
     if (actionType === 'update') {
@@ -105,7 +106,7 @@ const AddNewRoomScreen = ({ navigation, route }) => {
       }
 
       await apiRoom(url, newDataRoom, 'post')
-      navigation.navigate('RoomScreen', { roomUpdate: true })
+
       showMessage({
         message: "Thông báo",
         description: "Thêm phòng thành công",
@@ -113,7 +114,7 @@ const AddNewRoomScreen = ({ navigation, route }) => {
       })
       setDataRoom(initRoom)
       setIsLoading(false)
-
+      onClose()
     }
     catch {
       showMessage({
@@ -134,13 +135,13 @@ const AddNewRoomScreen = ({ navigation, route }) => {
         newDataRoom = { ...dataRoom, photoUrl: downloadURL, updatedAt: new Date() }
       }
       await apiRoom(`/update/${roomId}`, newDataRoom, 'put')
-      navigation.navigate('RoomScreen', { roomUpdate: true })
       showMessage({
         message: "Thông báo",
         description: "Sửa phòng thành công",
         type: "success",
       })
       setIsLoading(false)
+      onClose()
 
     }
     catch {
@@ -186,12 +187,13 @@ const AddNewRoomScreen = ({ navigation, route }) => {
               }
 
               await apiRoom(`/delete/${roomId}`, {}, 'delete');
-              navigation.navigate('RoomScreen', { roomUpdate: true });
+              navigation.navigate('RoomScreen');
               showMessage({
                 message: "Thông báo",
                 description: "Xoá phòng thành công",
                 type: "success",
               });
+              onClose()
             } catch (e) {
               console.log('Xoá phòng thất bại');
               showMessage({
@@ -210,62 +212,64 @@ const AddNewRoomScreen = ({ navigation, route }) => {
   };
 
   return (
-    <ContainerComponent>
-      {
-        actionType === 'create'
-          ?
-          <HeaderComponent text='Thêm phòng mới' isBack />
-          :
-          <HeaderComponent text='Cập nhật phòng' isBack
-            buttonRight={<Trash size={20} color={appColors.danger} />}
-            onRightPress={handleDeleteRoom}
-          />
-      }
-
-      <SectionComponent>
-        <ImagePickerComponent text={actionType === 'create' ? 'Thêm ảnh minh hoạ' : 'Thay đổi ảnh minh hoạ'} onSelect={(val) => { setImageSelected(val) }} />
-        <SpaceComponent height={8} />
-        {imageSelected
-          ? <Image source={{ uri: imageSelected?.path }} style={{ height: 150, width: '100%', borderRadius: 10 }} resizeMode='cover' />
-          : dataRoom.photoUrl && <Image source={{ uri: dataRoom?.photoUrl }} style={{ height: 150, width: '100%', borderRadius: 10 }} resizeMode='cover' />
-        }
-
-      </SectionComponent>
-
-      <SectionComponent>
-        <InputComponent
-          title='Tên phòng'
-          placeholder='Nhập tên phòng'
-          allowClear
-          value={dataRoom.roomName}
-          onChangeText={val => handleChangeValue('roomName', val)}
-        />
-
-        <SpaceComponent height={14} />
-
-        <InputComponent
-          title='Giá'
-          placeholder='Nhập giá phòng'
-          allowClear
-          value={dataRoom.roomPrice.toString()}
-          keyboardType='number-pad'
-          onChangeText={val => handleChangeValue('roomPrice', val)}
-        />
-      </SectionComponent>
-
-      <SpaceComponent height={14} />
-      <SectionComponent>
+    <Modal visible={visible}>
+      <ContainerComponent>
         {
           actionType === 'create'
             ?
-            <ButtonComponent text='Thêm phòng' onPress={handleCreateNewRoom} />
+            <HeaderComponent text='Thêm phòng mới' isBack customIsBack={onClose} />
             :
-            <ButtonComponent text='Cập nhật phòng' onPress={handleUpdateRoom} />
+            <HeaderComponent text='Cập nhật phòng' isBack customIsBack={onClose}
+              buttonRight={<Trash size={20} color={appColors.danger} />}
+              onRightPress={handleDeleteRoom}
+            />
         }
-      </SectionComponent>
-      <LoadingModalComponent visible={isLoading} />
-    </ContainerComponent>
+
+        <SectionComponent>
+          <ImagePickerComponent text={actionType === 'create' ? 'Thêm ảnh minh hoạ' : 'Thay đổi ảnh minh hoạ'} onSelect={(val) => { setImageSelected(val) }} />
+          <SpaceComponent height={8} />
+          {imageSelected
+            ? <Image source={{ uri: imageSelected?.path }} style={{ height: 150, width: '100%', borderRadius: 10 }} resizeMode='cover' />
+            : dataRoom.photoUrl && <Image source={{ uri: dataRoom?.photoUrl }} style={{ height: 150, width: '100%', borderRadius: 10 }} resizeMode='cover' />
+          }
+
+        </SectionComponent>
+
+        <SectionComponent>
+          <InputComponent
+            title='Tên phòng'
+            placeholder='Nhập tên phòng'
+            allowClear
+            value={dataRoom.roomName}
+            onChangeText={val => handleChangeValue('roomName', val)}
+          />
+
+          <SpaceComponent height={14} />
+
+          <InputComponent
+            title='Giá'
+            placeholder='Nhập giá phòng'
+            allowClear
+            value={dataRoom.roomPrice.toString()}
+            keyboardType='number-pad'
+            onChangeText={val => handleChangeValue('roomPrice', val)}
+          />
+        </SectionComponent>
+
+        <SpaceComponent height={14} />
+        <SectionComponent>
+          {
+            actionType === 'create'
+              ?
+              <ButtonComponent text='Thêm phòng' onPress={handleCreateNewRoom} />
+              :
+              <ButtonComponent text='Cập nhật phòng' onPress={handleUpdateRoom} />
+          }
+        </SectionComponent>
+        <LoadingModalComponent visible={isLoading} />
+      </ContainerComponent>
+    </Modal>
   )
 }
 
-export default AddNewRoomScreen
+export default AddNewRoomModal

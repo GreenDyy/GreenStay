@@ -9,6 +9,7 @@ import SpaceComponent from './SpaceComponent';
 import TextComponent from './TextComponent';
 import ButtonComponent from './ButtonComponent';
 import SectionComponent from './SectionComponent';
+import { ScrollView } from 'react-native-gesture-handler';
 
 interface Props {
     onSelect: (val: any[]) => void;
@@ -68,24 +69,25 @@ const DropDownMultibleSelectComponent = (props: Props) => {
                 onPress={() => setIsShowDropdown(!isShowDropdown)}
             >
                 <RowComponent>
-                    <TextComponent flex={1} text={selected ?? 'Chọn'}/>
+                    <TextComponent flex={1} text={selected ?? 'Chọn'} />
                     {isShowDropdown ? <ArrowUp2 size={22} color={appColors.text} /> : <ArrowDown2 size={22} color={appColors.text} />}
                 </RowComponent>
             </TouchableOpacity>
             {isShowDropdown && (
                 <View style={[styles.dropdown, globalStyle.shadow]}>
-                    <FlatList
-                        data={data}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item, index }) => (
-                            <TouchableOpacity onPress={() => handleSelectMultible(item.value)} >
-                                {renderItem(item, index)}
-                            </TouchableOpacity>
-                        )}
-                    />
-                    <SpaceComponent height={30} />
-                    <SectionComponent>
+                    <ScrollView nestedScrollEnabled     >
+                        {data.map((item, index) => {
+                            return (
+                                <TouchableOpacity key={index} onPress={() => handleSelectMultible(item.value)} >
+                                    {renderItem(item, index)}
+                                </TouchableOpacity>
+                            )
+                        })}
+                    </ScrollView>
 
+                    <SpaceComponent height={30} />
+
+                    <SectionComponent>
                         <ButtonComponent text='Đóng' onPress={handleConfirmSelected} />
                     </SectionComponent>
                 </View>
@@ -104,6 +106,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         maxHeight: 300,
         zIndex: 1000,
+        overflow: 'hidden',
     },
 });
 

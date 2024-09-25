@@ -9,6 +9,9 @@ import { images } from '../../constants/images'
 import { globalStyle } from '../../styles/globalStyle'
 import { Text } from 'react-native-svg'
 import { checkNamNhuan, getDate } from '../../utils/Utils'
+import AddInvoiceModal from '../invoice/AddInvoiceModal'
+import AddNewRoomModal from './AddNewRoomModal'
+import AddContractModal from '../contract/AddContractModal'
 
 const initRoom = {
     "roomId": 1,
@@ -30,10 +33,15 @@ const DetailRoomScreen = ({ navigation, route }) => {
     const [dataCustomers, setDataCustomers] = useState([])
     const [startDate, setStartDate] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
+    const [isShowModalInvoiceAdd, setIsShowModalInvoiceAdd] = useState(false)
+    const [isShowModalRoomUpdate, setIsShowModalRoomUpdate] = useState(false)
+    const [isShowModalContractAdd, setIsShowModalContractAdd] = useState(false)
 
+    //các trường hợp cần refesh data
     useEffect(() => {
-        fetchDataRoom()
-    }, [])
+        if (!isShowModalRoomUpdate)
+            fetchDataRoom()
+    }, [isShowModalRoomUpdate, isShowModalContractAdd])
 
     useEffect(() => {
         fetchDataMemberOfRoom()
@@ -169,11 +177,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
                 text='Thông tin phòng'
                 isBack
                 buttonRight={<Edit size={20} color={appColors.text} />}
-                onRightPress={() => navigation.navigate('AddNewRoomScreen',
-                    {
-                        roomId,
-                        actionType: 'update'
-                    })}
+                onRightPress={() => setIsShowModalRoomUpdate(true)}
             />
             <SectionComponent>
                 <RowComponent>
@@ -250,14 +254,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
                 {/* trả phòng thì đổi trạng thái phòng, xuất bill, chuyển trạng thái rental */}
                 {
                     dataRoom.isAvailable
-                    && <ButtonComponent text='Cho thuê' onPress={() => {
-                        navigation.navigate('Contract', {
-                            screen: 'AddContractScreen',
-                            params: {
-                                roomId: roomId
-                            }
-                        })
-                    }} />
+                    && <ButtonComponent text='Cho thuê' onPress={() => setIsShowModalContractAdd(true)} />
                 }
 
                 {
@@ -266,10 +263,11 @@ const DetailRoomScreen = ({ navigation, route }) => {
                     //     <TextComponent text='Ngày thuê so với ngày hiện tại, nếu mà đúng ngày của tháng mới thì cho nút tính tiền hiện lên' />
                     //     <ButtonComponent text='Thanh toán tiền tháng' onPress={() => { checkMonthlyBilling(startDate) }} />
                     // </View>
-                    <ButtonComponent text='Tạo hoá đơn thu tiền' onPress={()=>{navigation.navigate('Invoice', {
-                        screen: 'AddInvoiceScreen',
-                        params: {roomId: roomId}
-                    })}}/>
+                    // <ButtonComponent text='Tạo hoá đơn thu tiền' onPress={()=>{navigation.navigate('Invoice', {
+                    //     screen: 'AddInvoiceScreen',
+                    //     params: {roomId: roomId}
+                    // })}}/>
+                    <ButtonComponent text='Tạo hoá đơn thu tiền' onPress={() => { setIsShowModalInvoiceAdd(true) }} />
 
 
 
@@ -280,6 +278,10 @@ const DetailRoomScreen = ({ navigation, route }) => {
 
                 </RowComponent>
             </SectionComponent>
+            {/* các modal */}
+            <AddInvoiceModal roomId={roomId} visible={isShowModalInvoiceAdd} onClose={() => setIsShowModalInvoiceAdd(false)} />
+            <AddNewRoomModal actionType={'update'} roomId={roomId} visible={isShowModalRoomUpdate} onClose={() => setIsShowModalRoomUpdate(false)} />
+            <AddContractModal visible={isShowModalContractAdd} roomId={roomId} onClose={() => setIsShowModalContractAdd(false)} />
             <LoadingModalComponent visible={isLoading} />
         </ContainerComponent>
     )

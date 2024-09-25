@@ -71,7 +71,18 @@ const BottomTabNavigator = () => {
             }
         })}>
             <Tab.Screen name='Trang chủ' component={HomeNavigator} />
-            <Tab.Screen name='Phòng' component={RoomNavigator} />
+            <Tab.Screen name='Phòng' component={RoomNavigator}
+                // listeners={({ navigation }) => ({
+                //     tabPress: e => {
+                //         // Ngăn chặn mặc định để không chuyển trang ngay lập tức
+                //         // e.preventDefault();
+                //         navigation.reset({
+                         
+                //             routes: [{ name: 'RoomScreen' }], 
+                //         });
+                //     },
+                // })} 
+                />
             <Tab.Screen name='Main' component={TestScreen} />
             <Tab.Screen name='Người thuê' component={CustomerNavigator} />
             <Tab.Screen name='Hoá đơn' component={RoomNavigator} />

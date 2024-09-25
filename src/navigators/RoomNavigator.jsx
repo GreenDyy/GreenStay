@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
-import { AddNewRoomScreen, DetailRoomScreen, RoomScreen } from '../screens'
+import { DetailRoomScreen, RoomScreen } from '../screens'
 
 const RoomNavigator = () => {
     const Stack = createNativeStackNavigator()
@@ -10,7 +10,6 @@ const RoomNavigator = () => {
             headerShown: false
         }}>
             <Stack.Screen name='RoomScreen' component={RoomScreen} />
-            <Stack.Screen name='AddNewRoomScreen' component={AddNewRoomScreen} />
             <Stack.Screen name='DetailRoomScreen' component={DetailRoomScreen} />
         </Stack.Navigator>
     )

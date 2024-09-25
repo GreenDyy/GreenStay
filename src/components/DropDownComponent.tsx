@@ -7,6 +7,7 @@ import { globalStyle } from '../styles/globalStyle';
 import RowComponent from './RowComponent';
 import SpaceComponent from './SpaceComponent';
 import TextComponent from './TextComponent';
+import { ScrollView } from 'react-native-gesture-handler';
 
 interface Props {
     onSelect: (val: any) => void;
@@ -57,15 +58,15 @@ const DropDownComponent = (props: Props) => {
 
             {isShowDropdown && (
                 <View style={[styles.dropdown, globalStyle.shadow]}>
-                    <FlatList
-                        data={data}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item, index }) => (
-                            <TouchableOpacity onPress={() => handleSelect(item.value)}  >
-                                {renderItem(item, index)}
-                            </TouchableOpacity>
-                        )}
-                    />
+                    <ScrollView nestedScrollEnabled     >
+                        {data.map((item, index) => {
+                            return (
+                                <TouchableOpacity key={index} onPress={() => handleSelect(item.value)}  >
+                                    {renderItem(item, index)}
+                                </TouchableOpacity>
+                            )
+                        })}
+                    </ScrollView>
                 </View>
             )}
         </View>
@@ -81,7 +82,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 5,
         maxHeight: 180,
-        zIndex: 1000
+        zIndex: 1000,
+        overflow: 'hidden',
     },
 });
 

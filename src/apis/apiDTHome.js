@@ -37,7 +37,7 @@ const apiWater = async (url, data = null, method = 'get') => {
 }
 
 const apiTrash = async (url, data = null, method = 'get') => {
-    return await axiosClient(`/apiTrash${url}`, {
+    return await axiosClient(`/Trash${url}`, {
         method: method ?? 'get',
         data,
     })

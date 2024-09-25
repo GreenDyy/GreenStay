@@ -11,18 +11,19 @@ import TextComponent from './TextComponent';
 interface Props {
     text: string;
     isBack?: boolean;
-    isBackNavigate?: () => void;
+
     buttonRight?: ReactNode;
     onRightPress?: () => void;
+    customIsBack?: () => void
 }
 
 const HeaderComponent = (props: Props) => {
     const navigation = useNavigation();
-    const { text, isBack, buttonRight, onRightPress, isBackNavigate } = props;
+    const { text, isBack, buttonRight, onRightPress, customIsBack } = props;
 
     const handleBackPress = () => {
-        if (isBackNavigate) {
-            isBackNavigate();
+        if (customIsBack) {
+            customIsBack()
         } else {
             navigation.goBack();
         }

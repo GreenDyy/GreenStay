@@ -1,28 +1,36 @@
-import { Category2, Grid2, Layer, SearchStatus } from 'iconsax-react-native';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { showMessage } from 'react-native-flash-message';
+import { Category2, Layer, SearchStatus } from 'iconsax-react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { apiCustomer, apiMemberOfRental, apiRental, apiRoom } from '../../apis/apiDTHome';
 import { AvatarGroupComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, LoadingModalComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components';
 import InputComponent from '../../components/InputComponent';
 import { appColors } from '../../constants/appColors';
 import { appFonts } from '../../constants/appFonts';
-import { globalStyle } from '../../styles/globalStyle';
 import { images } from '../../constants/images';
-import { appInfors } from '../../constants/appInfors';
-import { useFocusEffect } from '@react-navigation/native';
+import { globalStyle } from '../../styles/globalStyle';
+import AddNewRoomModal from './AddNewRoomModal';
 
 const RoomScreen = ({ navigation, route }) => {
   const [isGrid, setIsGird] = useState(true)
   const [searchKey, setSearchKey] = useState('')
   const [dataRooms, setDataRooms] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isShowModalAdd, setIsShowModalAdd] = useState(false)
 
   useEffect(() => {
-    fetchDataRooms()
-    navigation.setParams({ roomUpdate: false });
-  }, [route.params?.roomUpdate])
+    if (!isShowModalAdd) {
+      fetchDataRooms()
+    }
+  }, [isShowModalAdd])
+
+  useEffect(() => {
+    const reFetchData = navigation.addListener('focus', () => {
+      fetchDataRooms(); // Cập nhật dữ liệu khi quay lại màn hình
+    });
+
+    return reFetchData;
+  }, []);
 
   const fetchDataRooms = async () => {
     const url = '/get-all';
@@ -159,7 +167,8 @@ const RoomScreen = ({ navigation, route }) => {
         initialNumToRender={6}
         maxToRenderPerBatch={10}
       />
-      <FloatAddButtonComponent onPress={() => navigation.navigate('AddNewRoomScreen', { actionType: 'create' })} />
+      <FloatAddButtonComponent onPress={() => { setIsShowModalAdd(true) }} />
+      <AddNewRoomModal visible={isShowModalAdd} onClose={() => setIsShowModalAdd(false)} actionType={'create'} />
       <LoadingModalComponent visible={isLoading} />
     </ContainerComponent>
   )

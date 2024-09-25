@@ -5,6 +5,7 @@ import { apiCustomer } from '../../apis/apiDTHome'
 import { appColors } from '../../constants/appColors'
 import { Edit } from 'iconsax-react-native'
 import { images } from '../../constants/images'
+import AddNewCustomerModal from './AddNewCustomerModal'
 
 const initCustomer = {
     "customerId": 1,
@@ -27,10 +28,12 @@ const DetailCustomerScreen = ({ navigation, route }) => {
     const { customerId } = route.params
     const [customer, setCustomer] = useState(initCustomer)
     const [isLoading, setIsLoading] = useState(false)
+    const [isShowModalCustomerUpdate, setIsShowModalCustomerUpdate] = useState(false)
 
     useEffect(() => {
-        fetchcustomer()
-    }, [])
+        if (!isShowModalCustomerUpdate)
+            fetchcustomer()
+    }, [isShowModalCustomerUpdate])
 
     const fetchcustomer = async () => {
         setIsLoading(true)
@@ -52,11 +55,7 @@ const DetailCustomerScreen = ({ navigation, route }) => {
                 text='Thông tin khách hàng'
                 isBack
                 buttonRight={<Edit size={20} color={appColors.text} />}
-                onRightPress={() => navigation.navigate('AddNewCustomerScreen',
-                    {
-                        customerId,
-                        actionType: 'update'
-                    })}
+                onRightPress={() => setIsShowModalCustomerUpdate(true)}
             />
             <SectionComponent style={{ alignItems: 'center' }}>
                 <CircleComponent size={96} style={{ overflow: 'visible' }} >
@@ -77,6 +76,7 @@ const DetailCustomerScreen = ({ navigation, route }) => {
                 <TextComponent text={customer?.customerName} />
             </SectionComponent>
 
+            <AddNewCustomerModal actionType={'update'} customerId={customerId} visible={isShowModalCustomerUpdate} onClose={() => setIsShowModalCustomerUpdate(false)} />
             <LoadingModalComponent visible={isLoading} />
         </ContainerComponent>
     )
