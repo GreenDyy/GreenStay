@@ -1,4 +1,4 @@
-import { View, Text, Image, Modal } from 'react-native'
+import { View, Text, Image, Modal, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { ButtonComponent, CircleComponent, ContainerComponent, DropDownComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import { apiCustomer, apiInvoice, apiPower, apiRental, apiRoom, apiTrash, apiWater } from '../../apis/apiDTHome'
@@ -13,8 +13,8 @@ const initInvoice = {
     "roomId": "",
     "createAt": new Date(),
     "amount": "0",
-    "status": "Chờ thanh toán",
-    "description": "",
+    "status": "Chưa thanh toán",
+    "description": `Thu tiền phòng tháng ${new Date().getMonth() + 1}`,
     "waterStart": "",
     "waterEnd": "",
     "powerStart": "",
@@ -31,6 +31,7 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
     const [waterMoney, setWaterMoney] = useState(0)
     const [powerMoney, setPowerMoney] = useState(0)
     const [trashMoney, setTrashMoney] = useState(0)
+    const [totalAmount, setTotalAmount] = useState(0);
 
     const [waterPricePerUnit, setWaterPricePerUnit] = useState(0)
     const [powerPricePerUnit, setPowerPricePerUnit] = useState(0)
@@ -39,6 +40,7 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
 
     const [isLoading, setIsLoading] = useState(false)
     const [isFormValid, setIsFormValid] = useState(false)
+    const [messError, setMessError] = useState('')
 
     //lấy roomId lun nếu nó dc truyền từ màn khác
     useEffect(() => {
@@ -88,29 +90,23 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
         console.log(invoice)
     }, [invoice])
 
-    // //tính tiền nước sau khi waterUsage thay đổi
-    // useEffect(() => {
-    //     tinhTienNuoc()
-    // }, [invoice.waterUsage])
+    //tính tiền nước sau khi waterUsage thay đổi
+    useEffect(() => {
+        tinhTienNuoc()
+        tinhTongTien()
+    }, [invoice.waterUsage])
     // //tính tiền diện sau khi powerUsage thay đổi
-    // useEffect(() => {
-    //     tinhTienDien()
-    // }, [invoice.powerUsage])
-    // //tính tổng tiền
-    // useEffect(() => {
-    //     const tinhTongTien = () => {
-    //         const tien = room?.roomPrice + waterMoney + powerMoney + trashMoney
-    //         handleChangeValue('amount', tien)
-    //     }
-    //     tinhTongTien()
-    // }, [waterMoney, powerMoney])
+    useEffect(() => {
+        tinhTienDien()
+        tinhTongTien()
+    }, [invoice.powerUsage])
 
     const fetchDataWaterPowerTrash = async () => {
         try {
             const water = await apiWater(`/latest-price`)
             setWaterPricePerUnit(water.pricePerUnit)
             const power = await apiPower(`/latest-price`)
-            setWaterPricePerUnit(power.pricePerUnit)
+            setPowerPricePerUnit(power.pricePerUnit)
             const trash = await apiTrash(`/latest-price`)
             setTrashMoney(trash.pricePerUnit)
         }
@@ -169,55 +165,105 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
     }
 
     const tinhTienNuoc = () => {
-        const tienNuoc = waterPricePerUnit * invoice.waterUsage
-        setWaterMoney(tienNuoc)
+        const tien = waterPricePerUnit * invoice.waterUsage
+        setWaterMoney(tien)
     }
 
     const tinhTienDien = () => {
-        const tienDien = powerPricePerUnit * invoice.powerUsage
-        setPowerMoney(tienDien)
+        const tien = powerPricePerUnit * invoice.powerUsage
+        setPowerMoney(tien)
     }
 
-    const handleCreateInvoice = async () => {
-        //
+    const tinhTongTien = () => {
+        const tien = room?.roomPrice + waterMoney + powerMoney + trashMoney
+        setTotalAmount(tien);
+    }
 
-        setIsLoading(true)
-        try {
-            //b1: tạo invoice
-            let dataInvoice = {
-                ...invoice,
-                powerStart: room.powerAfter,
-                waterStart: room.waterAfter,
-                createAt: new Date(),
-            }
-            const res = await apiInvoice(`/create`, dataInvoice, 'post')
-            if (res) {
-                //b2: cập nhật powerAfter, Water
-                const newDataRoom = {
-                    ...room,
-                    waterAfter: invoice.waterEnd,
-                    powerAfter: invoice.powerEnd,
-                    updatedAt: new Date()
-                }
-                await apiRoom(`/update/${room.roomId}`, newDataRoom, 'put')
-                showMessage({
-                    message: 'Thông báo',
-                    description: 'Tạo phiếu thu thành công',
-                    type: 'success'
-                })
-            }
-
-
-            setIsLoading(false)
+    //validate tổng quát form 
+    const generalValidate = () => {
+        if (!invoice.roomId || !invoice.powerEnd || !invoice.waterEnd) {
+            return false
         }
-        catch (e) {
+        return true
+    }
+    const handleCreateInvoice = async () => {
+        setIsLoading(true)
+        if (!generalValidate()) {
             showMessage({
                 message: 'Thông báo',
-                description: 'Tạo phiếu thuê thất bại',
-                type: 'danger'
+                description: 'Vui lòng nhập đầy đủ thông tin',
+                type: 'warning',
             })
+            Alert.alert('Thông báo', 'Vui lòng nhập đầy đủ thông tin')
             setIsLoading(false)
-            console.log('tạo thất bại: ', e)
+            console.log('Vui lòng nhập đầy đủ thông tin')
+        }
+        else {
+            try {
+                //b1: tạo invoice
+                let dataInvoice = {
+                    ...invoice,
+                    amount: totalAmount,
+                    powerStart: room.powerAfter,
+                    waterStart: room.waterAfter,
+                    createAt: new Date(),
+                }
+                console.log('check data lần cuối: ', dataInvoice)
+                const res = await apiInvoice(`/create`, dataInvoice, 'post')
+                if (res) {
+                    //b2: cập nhật powerAfter, Water
+                    const newDataRoom = {
+                        ...room,
+                        waterAfter: invoice.waterEnd,
+                        powerAfter: invoice.powerEnd,
+                        updatedAt: new Date()
+                    }
+
+                    await apiRoom(`/update/${room.roomId}`, newDataRoom, 'put')
+                    showMessage({
+                        message: 'Thông báo',
+                        description: 'Tạo phiếu thu thành công',
+                        type: 'success'
+                    })
+                }
+                else {
+                    showMessage({
+                        message: 'Thông báo',
+                        description: 'that bại từ lúc tạo Invoice',
+                        type: 'danger'
+                    })
+                }
+                setIsLoading(false)
+                onClose()
+            }
+            catch (e) {
+                showMessage({
+                    message: 'Thông báo',
+                    description: 'Tạo phiếu thuê thất bại',
+                    type: 'danger'
+                })
+                setIsLoading(false)
+                console.log('tạo thất bại: ', e)
+            }
+        }
+    }
+
+    const checkValueCuoiKy = (key) => {
+        switch (key) {
+            case 'waterEnd':
+                if (invoice.waterEnd <= room?.waterAfter) {
+                    Alert.alert('Cảnh báo', 'Số nước cuối kỳ không hợp lệ')
+                    handleChangeValue(key, '')
+                }
+                break
+            case 'powerEnd':
+                if (invoice.powerEnd <= room?.powerAfter) {
+                    Alert.alert('Cảnh báo', 'Số điện cuối kỳ không hợp lệ')
+                    handleChangeValue(key, '')
+                }
+                break
+            default:
+                break
         }
     }
 
@@ -252,7 +298,10 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
                         allowClear
                         keyboardType='number-pad'
                         onChangeText={(value) => handleChangeValue('powerEnd', value)}
-                        onEndEditing={() => handleChangeValue('powerUsage', invoice.powerEnd - room?.powerAfter)}
+                        onEndEditing={() => {
+                            handleChangeValue('powerUsage', invoice.powerEnd - room?.powerAfter)
+                            checkValueCuoiKy('powerEnd')
+                        }}
                     />
                     <SpaceComponent height={14} />
                     <InputComponent
@@ -262,7 +311,10 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
                         allowClear
                         keyboardType='number-pad'
                         onChangeText={(value) => handleChangeValue('waterEnd', value)}
-                        onEndEditing={() => handleChangeValue('waterUsage', invoice.waterEnd - room?.waterAfter)}
+                        onEndEditing={() => {
+                            handleChangeValue('waterUsage', invoice.waterEnd - room?.waterAfter)
+                            checkValueCuoiKy('waterEnd')
+                        }}
 
                     />
                     <SpaceComponent height={14} />
@@ -288,7 +340,7 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
                     <SpaceComponent height={14} />
                     <TextComponent text={`Tiền phòng: ${room?.roomPrice ?? 0}`} />
                     <SpaceComponent height={14} />
-                    <TextComponent text={`Tổng tiền: ${invoice.amount}`} />
+                    <TextComponent text={`Tổng tiền: ${totalAmount}`} />
                     <SpaceComponent height={14} />
                     <RowComponent>
                         <TextComponent text={`Rental id: ${invoice.rentalId}`} />

@@ -1,7 +1,7 @@
-import { View, Text, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { ContainerComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import { FlatList } from 'react-native'
 import { apiInvoice } from '../../apis/apiDTHome'
+import { ContainerComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 
 const InvoiceWithStatusScreen = ({ navigation, route }) => {
     const { status } = route.params
@@ -31,6 +31,8 @@ const InvoiceWithStatusScreen = ({ navigation, route }) => {
         return (
             <RowComponent>
                 <TextComponent text={item.invoiceId} />
+                <TextComponent text={item.customerId} />
+                <TextComponent text={item.status} />
             </RowComponent>
         )
     }
@@ -45,7 +47,7 @@ const InvoiceWithStatusScreen = ({ navigation, route }) => {
                     keyExtractor={(item, index) => index.toString()}  // Sử dụng id nếu có
                 />
             </SectionComponent>
-            <LoadingModalComponent visible={isLoading}/>
+            <LoadingModalComponent visible={isLoading} />
         </ContainerComponent>
     )
 }

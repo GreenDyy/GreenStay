@@ -13,20 +13,21 @@ import { removeAuth } from '../../srcRedux/reducers/authReducer'
 import { globalStyle } from '../../styles/globalStyle'
 import { appInfors } from '../../constants/appInfors'
 import { Text } from 'react-native-svg'
+import DetailPriceModal from './DetailPriceModal'
 
 const categoryData = [
   {
-    id: 'dien',
+    id: 'power',
     title: 'Điện',
     price: '30000',
   },
   {
-    id: 'nuoc',
+    id: 'water',
     title: 'Nước',
     price: '21000',
   },
   {
-    id: 'rac',
+    id: 'trash',
     title: 'Rác',
     price: '27000',
   },
@@ -53,6 +54,8 @@ const HomeScreen = ({ navigation }) => {
   const [totalRoom, setTotalRoom] = useState(5)
   const [totalCustomer, setTotalCustomer] = useState(12)
   const [totalRoomEmpty, setTotalRoomEmpty] = useState(1)
+  const [isShowModalPrice, setIsShowModalPrice] = useState()
+  const [typePrice, setTypePrice] = useState('')
 
   const dispatch = useDispatch()
 
@@ -64,11 +67,11 @@ const HomeScreen = ({ navigation }) => {
         alignItems: 'center'
       }}>
         <SquareBorderComponent height={50} width={50} backgroundColor={appColors.bgSquare}
-          onPress={() => handlePressCategory(item)}
+          onPress={() => handlePressCategory(item.id)}
         >
-          {item.id === 'nuoc' && <Drop size={30} color={appColors.water} variant='Bold' />}
-          {item.id === 'dien' && <Flash size={30} color={appColors.yellow} variant='Bold' />}
-          {item.id === 'rac' && <Trash size={30} color={appColors.gray} variant='Bold' />}
+          {item.id === 'water' && <Drop size={30} color={appColors.water} variant='Bold' />}
+          {item.id === 'power' && <Flash size={30} color={appColors.yellow} variant='Bold' />}
+          {item.id === 'trash' && <Trash size={30} color={appColors.gray} variant='Bold' />}
 
         </SquareBorderComponent>
         <SpaceComponent height={8} />
@@ -78,8 +81,9 @@ const HomeScreen = ({ navigation }) => {
     )
   }
 
-  const handlePressCategory = (item) => {
-    navigation.navigate('DetailPriceScreen', { item })
+  const handlePressCategory = (id) => {
+    setTypePrice(id)
+    setIsShowModalPrice(true)
   }
 
   const handleNavigateManament = (id) => {
@@ -194,7 +198,7 @@ const HomeScreen = ({ navigation }) => {
           })}
         </RowComponent>
       </SectionComponent>
-
+      <DetailPriceModal visible={isShowModalPrice} onClose={()=>setIsShowModalPrice(false)} typePrice={typePrice} />
     </ContainerComponent>
   )
 }

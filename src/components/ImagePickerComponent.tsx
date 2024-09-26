@@ -4,6 +4,7 @@ import ButtonComponent from './ButtonComponent';
 import TextComponent from './TextComponent';
 import { globalStyle } from '../styles/globalStyle';
 import ImageCropPicker, { Options } from 'react-native-image-crop-picker';
+import { appColors } from '../constants/appColors';
 
 interface Props {
     onSelect: (val: any) => void;
@@ -50,7 +51,10 @@ const ImagePickerComponent = forwardRef((props: Props, ref) => {
         <>
             {/* Không cần gán ref cho TouchableOpacity */}
             <TouchableOpacity onPress={() => setIsShowModal(true)} style={style}>
-                <TextComponent text={text} style={style}/>
+                <TextComponent text={text} style={[{
+                    color: appColors.primary,
+                    textDecorationLine: 'underline'
+                }, style]} />
             </TouchableOpacity>
 
             <Modal

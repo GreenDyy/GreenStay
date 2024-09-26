@@ -8,7 +8,7 @@ import { appFonts } from '../../constants/appFonts'
 import { images } from '../../constants/images'
 import { globalStyle } from '../../styles/globalStyle'
 import { Text } from 'react-native-svg'
-import { checkNamNhuan, getDate } from '../../utils/Utils'
+import { checkNamNhuan, getDate, getDateStringType1 } from '../../utils/Utils'
 import AddInvoiceModal from '../invoice/AddInvoiceModal'
 import AddNewRoomModal from './AddNewRoomModal'
 import AddContractModal from '../contract/AddContractModal'
@@ -195,17 +195,6 @@ const DetailRoomScreen = ({ navigation, route }) => {
 
                 <SpaceComponent height={14} />
 
-                {/* <View>
-                    <RowComponent style={{ justifyContent: 'flex-start' }}>
-                        <TextComponent text='Chỉ số nước đầu kỳ: ' />
-                        <TextComponent text={dataRoom?.waterAfter} />
-                    </RowComponent>
-                    <RowComponent style={{ justifyContent: 'flex-start' }}>
-                        <TextComponent text='Chỉ số điện đầu kỳ: ' />
-                        <TextComponent text={dataRoom?.powerAfter} />
-                    </RowComponent>
-                </View> */}
-
                 <RowComponent>
                     <View style={[globalStyle.card, {
                         marginTop: 10,
@@ -259,24 +248,14 @@ const DetailRoomScreen = ({ navigation, route }) => {
 
                 {
                     !dataRoom.isAvailable &&
-                    // <View>
-                    //     <TextComponent text='Ngày thuê so với ngày hiện tại, nếu mà đúng ngày của tháng mới thì cho nút tính tiền hiện lên' />
-                    //     <ButtonComponent text='Thanh toán tiền tháng' onPress={() => { checkMonthlyBilling(startDate) }} />
-                    // </View>
-                    // <ButtonComponent text='Tạo hoá đơn thu tiền' onPress={()=>{navigation.navigate('Invoice', {
-                    //     screen: 'AddInvoiceScreen',
-                    //     params: {roomId: roomId}
-                    // })}}/>
                     <ButtonComponent text='Tạo hoá đơn thu tiền' onPress={() => { setIsShowModalInvoiceAdd(true) }} />
-
-
-
                 }
-                <RowComponent>
-                    <TextComponent text={getDate(startDate)} />
-                    <TextComponent text={getDate(new Date())} />
+                {!dataRoom.isAvailable &&
+                    <RowComponent style={{ marginTop: 14 }}>
+                        <TextComponent text={getDateStringType1(startDate)} />
+                        <TextComponent text={getDateStringType1(new Date())} />
 
-                </RowComponent>
+                    </RowComponent>}
             </SectionComponent>
             {/* các modal */}
             <AddInvoiceModal roomId={roomId} visible={isShowModalInvoiceAdd} onClose={() => setIsShowModalInvoiceAdd(false)} />

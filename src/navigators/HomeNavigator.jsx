@@ -12,7 +12,6 @@ const HomeNavigator = () => {
         }}
             initialRouteName='HomeScreen'>
             <Stack.Screen name='HomeScreen' component={HomeScreen} />
-            <Stack.Screen name='DetailPriceScreen' component={DetailPriceScreen} />
             {/* dưới là 1 stack màn nha */}
             <Stack.Screen name='Contract' component={ContractNavigator} />
             <Stack.Screen name='Invoice' component={InvoiceNavigator} />

@@ -13,6 +13,8 @@ const initRoom = {
   roomName: '',
   roomPrice: '',
   photoUrl: '',
+  waterAfter: '',
+  powerAfter: '',
   isVailable: true,
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -226,11 +228,12 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
         }
 
         <SectionComponent>
+          
           <ImagePickerComponent text={actionType === 'create' ? 'Thêm ảnh minh hoạ' : 'Thay đổi ảnh minh hoạ'} onSelect={(val) => { setImageSelected(val) }} />
-          <SpaceComponent height={8} />
+
           {imageSelected
-            ? <Image source={{ uri: imageSelected?.path }} style={{ height: 150, width: '100%', borderRadius: 10 }} resizeMode='cover' />
-            : dataRoom.photoUrl && <Image source={{ uri: dataRoom?.photoUrl }} style={{ height: 150, width: '100%', borderRadius: 10 }} resizeMode='cover' />
+            ? <Image source={{ uri: imageSelected?.path }} style={{ height: 150, width: '100%', borderRadius: 10, marginTop: 8 }} resizeMode='cover' />
+            : dataRoom.photoUrl && <Image source={{ uri: dataRoom?.photoUrl }} style={{ height: 150, width: '100%', borderRadius: 10, marginTop: 8 }} resizeMode='cover' />
           }
 
         </SectionComponent>
@@ -253,6 +256,28 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
             value={dataRoom.roomPrice.toString()}
             keyboardType='number-pad'
             onChangeText={val => handleChangeValue('roomPrice', val)}
+          />
+
+          <SpaceComponent height={14} />
+
+          <InputComponent
+            title='Số điện hiện tại'
+            placeholder='Nhập số điện hiện tại'
+            allowClear
+            value={String(dataRoom.powerAfter)}
+            keyboardType='number-pad'
+            onChangeText={val => handleChangeValue('powerAfter', val)}
+          />
+
+          <SpaceComponent height={14} />
+
+          <InputComponent
+            title='Số nước hiện tại'
+            placeholder='Nhập số nước hiện tại'
+            allowClear
+            value={dataRoom.waterAfter.toString()}
+            keyboardType='number-pad'
+            onChangeText={val => handleChangeValue('waterAfter', val)}
           />
         </SectionComponent>
 

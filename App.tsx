@@ -16,7 +16,6 @@ const App = () => {
         </NavigationContainer>
         <FlashMessage position="top" statusBarHeight={StatusBar.currentHeight} />
       </Provider>
-
     </GestureHandlerRootView>
   )
 }

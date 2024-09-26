@@ -46,13 +46,22 @@ const getTime = (date) => {
     return `${hour < 10 ? `0${hour}` : hour}:${minutes < 10 ? `0${minutes}` : minutes}`
 }
 
-const getDate = (date) => {
+const getDateStringType1 = (date) => {
     const newDate = new Date(date)
     const dayNumber = newDate.getDate()
     const monthString = appInfors.monthNamesVN[newDate.getMonth()]
     const yearNumber = newDate.getFullYear()
     return `${dayNumber < 10 ? `0${dayNumber}` : dayNumber} ${monthString}, ${yearNumber}`
 }
+
+// const getDateStringType2 = (date) => {
+//     const newDate = new Date(date)
+//     const dayNumber = newDate.getDate()
+//     const monthString = appInfors.monthNamesVN[newDate.getMonth()]
+//     const yearNumber = newDate.getFullYear()
+//     return `${dayNumber < 10 ? `0${dayNumber}` : dayNumber} ${monthString}, ${yearNumber}`
+// }
+
 const checkNamNhuan = (year) => {
     return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
 }
@@ -64,6 +73,6 @@ export {
     showAllKeyDataStorage,
     formatTime,
     getTime,
-    getDate,
+    getDateStringType1,
     checkNamNhuan
 }

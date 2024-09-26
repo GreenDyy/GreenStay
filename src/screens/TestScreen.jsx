@@ -1,11 +1,14 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import { ContainerComponent, SectionComponent, TextComponent } from '../components'
 
 const TestScreen = () => {
   return (
-    <View>
-      <Text>TestScreen</Text>
-    </View>
+    <ContainerComponent>
+      <SectionComponent>
+        <TextComponent text='Test' />
+      </SectionComponent>
+    </ContainerComponent>
   )
 }
 
