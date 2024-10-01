@@ -14,17 +14,17 @@ import AddNewRoomModal from './AddNewRoomModal'
 import AddContractModal from '../contract/AddContractModal'
 
 const initRoom = {
-    "roomId": 1,
-    "roomName": "Phòng 1",
-    "roomPrice": 1300000,
-    "waterAfter": 100,
-    "waterBefore": 90,
-    "powerAfter": 500,
-    "powerBefore": 450,
+    "roomId": 0,
+    "roomName": "",
+    "roomPrice": 0,
+    "waterAfter": 0,
+    "waterBefore": 0,
+    "powerAfter": 0,
+    "powerBefore": 0,
     "photoUrl": "",
     "isAvailable": false,
-    "createdAt": "2024-09-09T21:26:22.273",
-    "updatedAt": "2024-09-09T21:26:22.273"
+    "createdAt": "",
+    "updatedAt": ""
 }
 
 const DetailRoomScreen = ({ navigation, route }) => {
@@ -39,27 +39,38 @@ const DetailRoomScreen = ({ navigation, route }) => {
 
     //các trường hợp cần refesh data
     useEffect(() => {
-        if (!isShowModalRoomUpdate)
+        if (!isShowModalRoomUpdate) {
             fetchDataRoom()
+        }
     }, [isShowModalRoomUpdate, isShowModalContractAdd])
 
     useEffect(() => {
-        fetchDataMemberOfRoom()
+        if (dataRoom !== initRoom) {
+            console.log("dataRoom.isAvailable:", dataRoom.isAvailable, dataRoom.roomId);
+            console.log('fetchRental dc gọi')
+            fetchRental()
+        }
     }, [dataRoom])
 
-    useEffect(() => {
-        console.log('rental get-by-room:', startDate)
-    }, [startDate])
-
-    useEffect(() => {
-        const fetchRental = async () => {
-            const res = await apiRental(`/get-by-room-and-status/${roomId}/true`)
-            if (res && res.startDate) {
-                setStartDate(new Date(res.startDate));
+    const fetchRental = async () => {
+        try {
+            if (!dataRoom.isAvailable) {
+                const res = await apiRental(`/get-by-room-and-status/${roomId}/true`)
+                if (res && res.startDate) {
+                    setStartDate(new Date(res.startDate));
+                    fetchDataMemberOfRoom()
+                }
+                else {
+                    console.log('ko có data ')
+                }
             }
         }
-        fetchRental()
-    }, [dataRoom])
+
+        catch (e) {
+            setIsLoading(false)
+            console.log('fetchRental error: ', e)
+        }
+    }
 
     const fetchDataRoom = async () => {
         setIsLoading(true)
@@ -71,7 +82,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
         }
         catch (e) {
             setIsLoading(false)
-            console.log(e)
+            console.log('fetchDataRoom error: ', e)
         }
     }
 
@@ -93,7 +104,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
         }
         catch (e) {
             setIsLoading(false)
-            console.log(e)
+            console.log('fetchDataMemberOfRoom error: ', e)
         }
     }
 
@@ -129,8 +140,13 @@ const DetailRoomScreen = ({ navigation, route }) => {
     }
 
     const checkMonthlyBilling = (startDate) => {
-        const start = new Date('2024-09-21'); // Ngày bắt đầu trong hợp đồng
-        const today = new Date('2024-10-21'); // Ngày hiện tại
+        // const start = new Date('2024-10-01'); // Ngày bắt đầu trong hợp đồng
+        // const today = new Date('2024-10-21'); // Ngày hiện tại
+
+        //hàm này ko ổn, ko thể lấy bắt đầu trong hợp đồng dc
+
+        const start = new Date(startDate)
+        const today = new Date()
 
         const yearDifference = today.getFullYear() - start.getFullYear();
         const monthDifference = today.getMonth() - start.getMonth();
@@ -142,34 +158,46 @@ const DetailRoomScreen = ({ navigation, route }) => {
         if (totalMonthDifference === 1) {
             if (today.getDate() >= start.getDate()) {
                 console.log('Đã tới ngày thu tiền');
+                return true
             }
             else if (today.getMonth() + 1 === 2) { // Kiểm tra tháng 2
                 const lastDayOfFebruary = checkNamNhuan(today.getFullYear()) ? 29 : 28;
 
                 if (today.getDate() === lastDayOfFebruary) {
                     console.log('Đã tới ngày thu tiền');
+                    return true
                 } else {
                     console.log('Chưa tới ngày thu tiền');
+                    return false
                 }
             }
             else if ([4, 6, 9, 11].includes(today.getMonth() + 1)) { // Kiểm tra các tháng có 30 ngày
                 if (today.getDate() === 30) {
                     console.log('Đã tới ngày thu tiền');
+                    return true
                 } else {
                     console.log('Chưa tới ngày thu tiền');
+                    return false
                 }
             }
             else {
                 console.log('Chưa tới ngày thu tiền');
+                return false
             }
         }
         else if (totalMonthDifference >= 2) {
             console.log('Đã tới ngày thu tiền');
+            return true
         }
         else {
             console.log('Chưa tới ngày thu tiền');
+            return false
         }
     };
+
+    const handleCreateInvoice = () => {
+        setIsShowModalInvoiceAdd(true)
+    }
 
     return (
         <ContainerComponent isScroll>
@@ -182,8 +210,21 @@ const DetailRoomScreen = ({ navigation, route }) => {
             <SectionComponent>
                 <RowComponent>
                     <TextComponent text={dataRoom?.roomName} fontFamily={appFonts.boldOpenSans} fontSize={18} />
-                    <TextComponent text={`Giá phòng: ${dataRoom?.roomPrice.toLocaleString()}`} />
+                    <RowComponent style={{ justifyContent: 'flex-end' }}>
+                        <TextComponent text={`Giá phòng: `} fontFamily={appFonts.semiBoldOpenSans} />
+                        <TextComponent text={`${dataRoom?.roomPrice.toLocaleString()} VNĐ`} />
+                    </RowComponent>
                 </RowComponent>
+
+                {!dataRoom.isAvailable &&
+                    <>
+                        <SpaceComponent height={10} />
+                        <RowComponent style={{ justifyContent: 'flex-start' }}>
+                            <TextComponent text={`Ngày bắt đầu: `} fontFamily={appFonts.semiBoldOpenSans} />
+                            <TextComponent text={getDateStringType1(startDate)} />
+                        </RowComponent>
+                    </>
+                }
             </SectionComponent>
             {dataRoom.photoUrl &&
                 <SectionComponent>
@@ -206,7 +247,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
                             <Flash size={30} color={appColors.yellow} variant='Bold' />
                         </CircleComponent>
                         <SpaceComponent height={3} />
-                        <TextComponent text={dataRoom?.powerAfter} fontSize={12} fontFamily={appFonts.semiBoldOpenSans} />
+                        <TextComponent text={`${dataRoom?.powerAfter} kWh`} fontSize={12} fontFamily={appFonts.semiBoldOpenSans} />
                         <TextComponent text='Chỉ số điện đầu kỳ' fontSize={10} fontFamily={appFonts.mediumOpenSans} />
                     </View>
 
@@ -220,7 +261,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
                             <Drop size={30} color={appColors.water} variant='Bold' />
                         </CircleComponent>
                         <SpaceComponent height={3} />
-                        <TextComponent text={dataRoom?.waterAfter} fontSize={12} fontFamily={appFonts.semiBoldOpenSans} />
+                        <TextComponent text={`${dataRoom?.waterAfter} m³`} fontSize={12} fontFamily={appFonts.semiBoldOpenSans} />
                         <TextComponent text='Chỉ số nước đầu kỳ' fontSize={10} fontFamily={appFonts.mediumOpenSans} />
                     </View>
                 </RowComponent>
@@ -248,14 +289,12 @@ const DetailRoomScreen = ({ navigation, route }) => {
 
                 {
                     !dataRoom.isAvailable &&
-                    <ButtonComponent text='Tạo hoá đơn thu tiền' onPress={() => { setIsShowModalInvoiceAdd(true) }} />
+                    <RowComponent style={{ flexWrap: 'wrap' }}>
+                        <ButtonComponent text='Tạo phiếu thu' onPress={handleCreateInvoice} style={{ flex: 1 }} />
+                        <SpaceComponent width={20} />
+                        <ButtonComponent text='Chấm dứt hợp đồng' onPress={handleCreateInvoice} style={{ flex: 1, backgroundColor: appColors.danger }} />
+                    </RowComponent>
                 }
-                {!dataRoom.isAvailable &&
-                    <RowComponent style={{ marginTop: 14 }}>
-                        <TextComponent text={getDateStringType1(startDate)} />
-                        <TextComponent text={getDateStringType1(new Date())} />
-
-                    </RowComponent>}
             </SectionComponent>
             {/* các modal */}
             <AddInvoiceModal roomId={roomId} visible={isShowModalInvoiceAdd} onClose={() => setIsShowModalInvoiceAdd(false)} />

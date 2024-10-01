@@ -4,7 +4,7 @@ import { View } from 'react-native'
 import DatePicker from 'react-native-date-picker'
 import { appColors } from '../constants/appColors'
 import { appFonts } from '../constants/appFonts'
-import { getDate, getTime } from '../utils/Utils'
+import { getDateStringType1, getTime } from '../utils/Utils'
 import RowComponent from './RowComponent'
 import TextComponent from './TextComponent'
 import SpaceComponent from './SpaceComponent'
@@ -45,7 +45,7 @@ const DateTimePickerComponent = (props: Props) => {
             ]}>
                 <RowComponent onPress={() => { setIsShowDatePicker(true) }}>
                     <TextComponent
-                        text={selected ? (type === 'time' ? getTime(selected) : getDate(selected)) : 'Chọn ngày'}
+                        text={selected ? (type === 'time' ? getTime(selected) : getDateStringType1(selected)) : 'Chọn ngày'}
                         style={{ textAlign: 'center' }}
                         flex={1}
                         fontFamily={appFonts.mediumOpenSans} />

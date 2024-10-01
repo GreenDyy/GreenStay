@@ -1,15 +1,18 @@
 import { View, Modal, StyleProp, ViewStyle, TouchableOpacity } from 'react-native';
-import React, { useImperativeHandle, useState, forwardRef } from 'react';
+import React, { useImperativeHandle, useState, forwardRef, ReactNode } from 'react';
 import ButtonComponent from './ButtonComponent';
 import TextComponent from './TextComponent';
 import { globalStyle } from '../styles/globalStyle';
 import ImageCropPicker, { Options } from 'react-native-image-crop-picker';
 import { appColors } from '../constants/appColors';
+import RowComponent from './RowComponent';
+import SpaceComponent from './SpaceComponent';
 
 interface Props {
     onSelect: (val: any) => void;
     text: string;
     style: StyleProp<ViewStyle>;
+    icon?: ReactNode
 }
 
 const options: Options = {
@@ -19,7 +22,7 @@ const options: Options = {
 
 // Sử dụng forwardRef để truyền ref từ component cha vào
 const ImagePickerComponent = forwardRef((props: Props, ref) => {
-    const { onSelect, text, style } = props;
+    const { onSelect, text, style, icon } = props;
     const [isShowModal, setIsShowModal] = useState(false);
 
     // Expose hàm open() qua ref
@@ -51,10 +54,16 @@ const ImagePickerComponent = forwardRef((props: Props, ref) => {
         <>
             {/* Không cần gán ref cho TouchableOpacity */}
             <TouchableOpacity onPress={() => setIsShowModal(true)} style={style}>
-                <TextComponent text={text} style={[{
-                    color: appColors.primary,
-                    textDecorationLine: 'underline'
-                }, style]} />
+                <RowComponent style={{ justifyContent: 'flex-start' }}>
+                    {icon && <>
+                        {icon}
+                        <SpaceComponent width={5} />
+                    </>}
+                    <TextComponent text={text} style={[{
+                        color: appColors.primary,
+                        textDecorationLine: 'underline'
+                    }, style]} />
+                </RowComponent>
             </TouchableOpacity>
 
             <Modal

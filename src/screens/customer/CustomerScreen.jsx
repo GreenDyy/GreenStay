@@ -8,32 +8,50 @@ import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
 import { images } from '../../constants/images'
 import AddNewCustomerModal from './AddNewCustomerModal'
+import { useSelector } from 'react-redux'
+import customerReducer from '../../srcRedux/reducers/customerReducer'
 
 const CustomerScreen = ({ navigation, route }) => {
   const [searchKey, setSearchKey] = useState('')
   const [dataCustomers, setDataCustomers] = useState([])
+  const [dataCustomerOriginals, setDataCustomerOriginals] = useState([]);
   const [isLoading, setIsLoading] = useState(false)
   const [isShowModalAdd, setIsShowModalAdd] = useState(false)
+
+  const checkUpdateCustomer = useSelector(state => state.customerReducer.updatedValue)
 
   useEffect(() => {
     if (!isShowModalAdd) {
       fetchDataCustomers()
     }
-  }, [isShowModalAdd])
+  }, [isShowModalAdd, checkUpdateCustomer])
+
+  // useEffect(() => {
+  //   const reFetchData = navigation.addListener('focus', () => {
+  //     fetchDataCustomers(); // Cập nhật dữ liệu khi quay lại màn hình
+  //   });
+
+  //   return reFetchData;
+  // }, []);
 
   useEffect(() => {
-    const reFetchData = navigation.addListener('focus', () => {
-      fetchDataCustomers(); // Cập nhật dữ liệu khi quay lại màn hình
-    });
-
-    return reFetchData;
-  }, []);
+    if (searchKey) {
+      const filteredData = dataCustomerOriginals.filter(customer =>
+        customer.customerName.toLowerCase().includes(searchKey.toLowerCase())
+      )
+      setDataCustomers(filteredData)
+    }
+    else {
+      setDataCustomers(dataCustomerOriginals)
+    }
+  }, [searchKey])
 
   const fetchDataCustomers = async () => {
     setIsLoading(true)
     try {
       const res = await apiCustomer(`/get-all`, null, 'get')
       setDataCustomers(res)
+      setDataCustomerOriginals(res)
       setIsLoading(false)
     }
     catch (e) {
@@ -49,8 +67,6 @@ const CustomerScreen = ({ navigation, route }) => {
   useEffect(() => {
     console.log('data cus:', dataCustomers)
   }, [dataCustomers])
-
-
 
   const renderItemCustomer = ({ item }) => {
     return (
@@ -99,6 +115,7 @@ const CustomerScreen = ({ navigation, route }) => {
           allowClear
           value={searchKey}
           onChangeText={val => setSearchKey(val)}
+        // onEndEditing={handleSearchData}
         />
       </SectionComponent>
 

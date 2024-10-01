@@ -2,11 +2,12 @@ import { View, Text, StatusBar } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import MainNavigator from './MainNavigator';
 import { appColors } from '../constants/appColors';
-import { SplashScreen } from '../screens';
+
 import { getDataStorage } from '../utils/Utils';
 import AuthRouter from './AuthRouter';
 import { useSelector, useDispatch } from 'react-redux';
 import { addAuth } from '../srcRedux/reducers/authReducer';
+import { SplashScreen } from '../screens';
 
 const AppRouter = () => {
     const [isShowSplash, setIsShowSplash] = useState(true)

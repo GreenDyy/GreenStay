@@ -5,9 +5,11 @@ import InputComponent from '../../components/InputComponent'
 import { apiRoom } from '../../apis/apiDTHome'
 import { showMessage } from 'react-native-flash-message'
 import { appColors } from '../../constants/appColors'
-import { Trash } from 'iconsax-react-native'
+import { Image as ImageIcon, Trash } from 'iconsax-react-native'
 import storage from '@react-native-firebase/storage';
 import { useNavigation } from '@react-navigation/native'
+import { useDispatch } from 'react-redux'
+import { updateRooms } from '../../srcRedux/reducers/roomReducer'
 
 const initRoom = {
   roomName: '',
@@ -25,6 +27,8 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
   const [imageSelected, setImageSelected] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const navigation = useNavigation()
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (actionType === 'update') {
@@ -116,6 +120,7 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
       })
       setDataRoom(initRoom)
       setIsLoading(false)
+      dispatch(updateRooms(Math.random()))
       onClose()
     }
     catch {
@@ -143,6 +148,7 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
         type: "success",
       })
       setIsLoading(false)
+      dispatch(updateRooms(Math.random()))
       onClose()
 
     }
@@ -195,14 +201,16 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
                 description: "Xoá phòng thành công",
                 type: "success",
               });
+              dispatch(updateRooms(Math.random()))
               onClose()
             } catch (e) {
               console.log('Xoá phòng thất bại');
               showMessage({
                 message: "Thông báo",
-                description: "Xoá phòng thất bại",
+                description: "Xoá phòng thất bại do phòng đang được cho thuê",
                 type: "danger",
               });
+              onClose()
             }
             setIsLoading(false);
           },
@@ -228,8 +236,10 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
         }
 
         <SectionComponent>
-          
-          <ImagePickerComponent text={actionType === 'create' ? 'Thêm ảnh minh hoạ' : 'Thay đổi ảnh minh hoạ'} onSelect={(val) => { setImageSelected(val) }} />
+
+          <ImagePickerComponent text={actionType === 'create' ? 'Thêm ảnh minh hoạ' : 'Thay đổi ảnh minh hoạ'}
+            onSelect={(val) => { setImageSelected(val) }}
+            icon={<ImageIcon size={22} color={appColors.primary} />} />
 
           {imageSelected
             ? <Image source={{ uri: imageSelected?.path }} style={{ height: 150, width: '100%', borderRadius: 10, marginTop: 8 }} resizeMode='cover' />

@@ -1,19 +1,31 @@
 import { View, Text, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { CardComponent, ContainerComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import { CardComponent, ContainerComponent, FloatAddButtonComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import { apiCustomer, apiRental, apiRoom } from '../../apis/apiDTHome'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
+import { getDateStringType2 } from '../../utils/Utils'
+import AddContractModal from './AddContractModal'
+import { useSelector } from 'react-redux'
+import { RefreshControl } from 'react-native-gesture-handler'
 
 const ContractWithStatusScreen = ({ navigation, route }) => {
     const { isRenting } = route.params
     const [contracts, setContracts] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+    const [isShowModalContractAdd, setIsShowModalContractAdd] = useState(false)
+    const checkUpdate = useSelector((state) => state.contractReducer.contractData)
+    const [isRefreshing, setIsRefreshing] = useState(false)
 
     useEffect(() => {
         fetchContracts()
-    }, [])
+    }, [checkUpdate])
 
+    const onRefresh = () => {
+        setIsRefreshing(true)
+        fetchContracts()
+        setIsRefreshing(false)
+    }
 
     const fetchContracts = async () => {
         setIsLoading(true)
@@ -51,7 +63,7 @@ const ContractWithStatusScreen = ({ navigation, route }) => {
                     <SpaceComponent height={5} />
                     <TextComponent text={`#HD${item.rentalId}`} />
                     <SpaceComponent height={5} />
-                    <TextComponent text='04/02/2002' color={appColors.gray} fontSize={10} />
+                    <TextComponent text={getDateStringType2(item.createdAt)} color={appColors.gray} fontSize={10} />
                 </View>
 
                 <View style={{ alignItems: 'flex-end' }}>
@@ -70,9 +82,12 @@ const ContractWithStatusScreen = ({ navigation, route }) => {
             <FlatList
                 data={contracts.filter((item) => item.isRenting === isRenting)}
                 renderItem={renderContract}
-                keyExtractor={(item, index) => index.toString()}  // Sử dụng id nếu có
+                keyExtractor={(item, index) => index.toString()}  
+                refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
             />
-            <LoadingModalComponent visible={isLoading}/>
+             <FloatAddButtonComponent onPress={() => { setIsShowModalContractAdd(true) }} />
+             <AddContractModal visible={isShowModalContractAdd} onClose={() => setIsShowModalContractAdd(false)} />
+            <LoadingModalComponent visible={isLoading} />
         </ContainerComponent>
     )
 }

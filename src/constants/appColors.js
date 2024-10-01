@@ -11,7 +11,7 @@ export const appColors = {
     green2: '#A8D474',
     greenborder: '#97BE5A',
     link: '#5669FF',
-    danger: 'red',
+    danger: '#DC143C',
     bg_primary:'#EFF0FE',
     bgSquare: '#F7F5FA',
     yellow: '#FFB151',

@@ -27,7 +27,6 @@ const DetailPriceModal = ({ visible, onClose, typePrice }) => {
                     break
             }
             setDetailPrice(res)
-            console.log(res.pricePerUnit)
         }
         fetchData()
     }, [typePrice])

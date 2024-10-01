@@ -8,12 +8,14 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import Icon from 'react-native-vector-icons/Ionicons';
 import { removeItemDataStorage } from '../../utils/Utils'
 import axios from 'axios'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { removeAuth } from '../../srcRedux/reducers/authReducer'
 import { globalStyle } from '../../styles/globalStyle'
 import { appInfors } from '../../constants/appInfors'
 import { Text } from 'react-native-svg'
 import DetailPriceModal from './DetailPriceModal'
+import { apiCustomer, apiRoom } from '../../apis/apiDTHome'
+import Geolocation from '@react-native-community/geolocation'
 
 const categoryData = [
   {
@@ -44,20 +46,62 @@ const manamentData = [
     title: ' Quản lý hợp đồng'
   },
 
-  {
-    id: 'qlphongchuadongtien',
-    title: ' Phòng chưa thanh toán'
-  },
+  // {
+  //   id: 'qlphongchuadongtien',
+  //   title: ' Phòng chưa thanh toán'
+  // },
 ]
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
 const HomeScreen = ({ navigation }) => {
-  const [totalRoom, setTotalRoom] = useState(5)
-  const [totalCustomer, setTotalCustomer] = useState(12)
-  const [totalRoomEmpty, setTotalRoomEmpty] = useState(1)
-  const [isShowModalPrice, setIsShowModalPrice] = useState()
+  const [totalRoom, setTotalRoom] = useState(0)
+  const [totalCustomer, setTotalCustomer] = useState(0)
+  const [totalRoomEmpty, setTotalRoomEmpty] = useState(0)
+  const [isShowModalPrice, setIsShowModalPrice] = useState(false)
   const [typePrice, setTypePrice] = useState('')
+  const [myLocation, setMyLocation] = useState(null)
 
+  const checkUpdateCustomer = useSelector((state) => state.customerReducer.updatedValue)
+  const checkUpdateRoom = useSelector((state) => state.roomReducer.updatedValue)
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    const countRoom = async () => {
+      const rooms = await apiRoom(`/get-all`)
+      setTotalRoom(rooms.length)
+      const roomEmptys = rooms.filter(room => room.isAvailable)
+      setTotalRoomEmpty(roomEmptys.length)
+    }
+    const countCustomer = async () => {
+      const customers = await apiCustomer(`/get-all`)
+      setTotalCustomer(customers.length)
+    }
+    countRoom()
+    countCustomer()
+  }, [checkUpdateCustomer, checkUpdateRoom])
+
+  useEffect(() => {
+    Geolocation.getCurrentPosition((position) => {
+      if (position.coords) {
+        reverseGeoCode(position.coords.latitude, position.coords.longitude)
+      }
+      console.log('a', position)
+    })
+  }, []);
+
+  const reverseGeoCode = async (lat, long) => {
+    //lấy từ app eventhub bên here
+    const apiKey = 'dMtcjREnppyVY6bFJEA-J5SZzMxEzbnj18LNlWwsYzA'
+    const api = `https://geocode.search.hereapi.com/v1/revgeocode?at=${lat},${long}&apiKey=${apiKey}`
+    try {
+      const res = await axios.get(api)
+      const curLocation = res.data.items[0]
+      console.log(curLocation)
+      setMyLocation(curLocation)
+    }
+    catch (e) {
+      console.log(e)
+    }
+  }
 
   const renderItemCategory = (item) => {
     return (
@@ -96,10 +140,10 @@ const HomeScreen = ({ navigation }) => {
         screen: 'ContractScreen',
       })
         break
-      case 'qlphongchuadongtien': navigation.navigate('Contract', {
-        screen: 'ContractScreen',
-      })
-        break
+      // case 'qlphongchuadongtien': navigation.navigate('Contract', {
+      //   screen: 'ContractScreen',
+      // })
+      //   break
       default:
         break
 
@@ -198,7 +242,7 @@ const HomeScreen = ({ navigation }) => {
           })}
         </RowComponent>
       </SectionComponent>
-      <DetailPriceModal visible={isShowModalPrice} onClose={()=>setIsShowModalPrice(false)} typePrice={typePrice} />
+      <DetailPriceModal visible={isShowModalPrice} onClose={() => setIsShowModalPrice(false)} typePrice={typePrice} />
     </ContainerComponent>
   )
 }

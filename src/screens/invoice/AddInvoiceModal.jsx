@@ -1,11 +1,18 @@
-import { View, Text, Image, Modal, Alert } from 'react-native'
+import { ClipboardClose, ClipboardTick } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
-import { ButtonComponent, CircleComponent, ContainerComponent, DropDownComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
-import { apiCustomer, apiInvoice, apiPower, apiRental, apiRoom, apiTrash, apiWater } from '../../apis/apiDTHome'
-import { images } from '../../constants/images'
-import { appColors } from '../../constants/appColors'
-import InputComponent from '../../components/InputComponent'
+import { Alert, Image, Modal, TouchableOpacity } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
+import RNFS from 'react-native-fs'
+import RNHTMLtoPDF from 'react-native-html-to-pdf'
+import { apiCustomer, apiInvoice, apiPower, apiRental, apiRoom, apiTrash, apiWater } from '../../apis/apiDTHome'
+import { ButtonComponent, CircleComponent, ContainerComponent, DropDownComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import InputComponent from '../../components/InputComponent'
+import { appColors } from '../../constants/appColors'
+import { images } from '../../constants/images'
+import htmlInvoice from './htmlInvoice'
+import { getDateStringType2, printBillPdf } from '../../utils/Utils'
+import { useDispatch } from 'react-redux'
+import { updateInvoices } from '../../srcRedux/reducers/invoiceReducer'
 
 const initInvoice = {
     "rentalId": "",
@@ -41,6 +48,10 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
     const [isLoading, setIsLoading] = useState(false)
     const [isFormValid, setIsFormValid] = useState(false)
     const [messError, setMessError] = useState('')
+    const [isExportInvoice, setIsExportInvoice] = useState(false)
+    const [pdfPath, setPdfPath] = useState(null)
+
+    const dispatch = useDispatch()
 
     //lấy roomId lun nếu nó dc truyền từ màn khác
     useEffect(() => {
@@ -89,6 +100,12 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
     useEffect(() => {
         console.log(invoice)
     }, [invoice])
+    useEffect(() => {
+        if (isExportInvoice)
+            console.log('bạn chọn xuất bill')
+        else
+            console.log('bạn chọn ko xuất bill')
+    }, [isExportInvoice])
 
     //tính tiền nước sau khi waterUsage thay đổi
     useEffect(() => {
@@ -209,8 +226,8 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
                     createAt: new Date(),
                 }
                 console.log('check data lần cuối: ', dataInvoice)
-                const res = await apiInvoice(`/create`, dataInvoice, 'post')
-                if (res) {
+                const newInvoice = await apiInvoice(`/create`, dataInvoice, 'post')
+                if (newInvoice) {
                     //b2: cập nhật powerAfter, Water
                     const newDataRoom = {
                         ...room,
@@ -220,9 +237,38 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
                     }
 
                     await apiRoom(`/update/${room.roomId}`, newDataRoom, 'put')
+                    //optional: tạo phiếu thu pdf nếu có tick
+                    if (isExportInvoice) {
+                        try {
+                            const dataPrint = {
+                                customerName: customer.customerName,
+                                roomName: room.roomName,
+                                customerPhoneNumber: customer.phoneNumber,
+                                invoiceId: newInvoice.invoiceId,
+                                description: invoice.description,
+                                roomPrice: room.roomPrice.toLocaleString(),
+                                powerPrice: powerMoney.toLocaleString(),
+                                waterPrice: waterMoney.toLocaleString(),
+                                trashPrice: trashMoney.toLocaleString(),
+                                invoiceCreateAt: getDateStringType2(newInvoice.createAt),
+                                powerStart: invoice.powerStart,
+                                powerEnd: invoice.powerEnd,
+                                waterStart: invoice.waterStart,
+                                waterEnd: invoice.waterEnd,
+                                amount: totalAmount.toLocaleString()
+                            }
+                            const pathPdf = printBillPdf(dataPrint)
+                            if (pathPdf) {
+                                console.log('đã xuất bill pdf tại: ', pathPdf)
+                            }
+                        }
+                        catch (e) {
+                            console.log('loi xuat pdf: ', e)
+                        }
+                    }
                     showMessage({
                         message: 'Thông báo',
-                        description: 'Tạo phiếu thu thành công',
+                        description: isExportInvoice ? 'Tạo phiếu thu và xuất phiếu thành công' : 'Tạo phiếu thu thành công',
                         type: 'success'
                     })
                 }
@@ -234,6 +280,7 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
                     })
                 }
                 setIsLoading(false)
+                dispatch(updateInvoices(Math.random()))
                 onClose()
             }
             catch (e) {
@@ -243,6 +290,7 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
                     type: 'danger'
                 })
                 setIsLoading(false)
+                onClose()
                 console.log('tạo thất bại: ', e)
             }
         }
@@ -353,7 +401,17 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
                         allowClear
                         onChangeText={(value) => handleChangeValue('description', value)}
                     />
+                    <SpaceComponent height={14} />
+
+                    <TouchableOpacity onPress={() => { setIsExportInvoice(preVal => !preVal) }}>
+                        <RowComponent style={{ justifyContent: 'flex-start' }}>
+                            <TextComponent text='Xuất phiếu: ' />
+                            {isExportInvoice ? <ClipboardTick size={22} color={appColors.primary} /> : <ClipboardClose size={22} color={appColors.danger} />}
+                        </RowComponent>
+                    </TouchableOpacity>
+
                 </SectionComponent>
+
 
                 <SectionComponent>
                     <ButtonComponent text='Tạo phiếu thu' onPress={handleCreateInvoice} />

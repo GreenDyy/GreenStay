@@ -1,6 +1,6 @@
 import { Book, Check, TickCircle } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
-import { Image, Modal } from 'react-native'
+import { Alert, Image, Modal } from 'react-native'
 import { apiCustomer, apiMemberOfRental, apiRental, apiRoom } from '../../apis/apiDTHome'
 import { ButtonComponent, CircleComponent, ContainerComponent, DropDownComponent, DropDownMultibleSelectComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import InputComponent from '../../components/InputComponent'
@@ -8,6 +8,8 @@ import { appColors } from '../../constants/appColors'
 import { showMessage } from 'react-native-flash-message'
 import { images } from '../../constants/images'
 import AddNewCustomerModal from '../customer/AddNewCustomerModal'
+import { useDispatch } from 'react-redux'
+import { updateContracts } from '../../srcRedux/reducers/contractReducer'
 //các bảng sẽ tương tác: Rental, Customer maybe, Room, MemberOfRental
 
 const initContract = {
@@ -33,10 +35,14 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
 
     const [isShowModalCustomerAdd, setIsShowModalCustomerAdd] = useState(false)
 
+    const dispatch = useDispatch()
+
     //lấy roomId lun nếu nó dc truyền từ màn khác
     useEffect(() => {
         if (roomId) {
+            console.log('tao đã tự lấy roomId nè: ', roomId)
             handleChangeValue('roomId', roomId)
+            setContract(preData => ({ ...preData, roomId: roomId }))
         }
     }, [roomId])
 
@@ -137,7 +143,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
             setIsLoading(false)
         }
         catch (e) {
-            console.log(e)
+            console.log('fetchDataCustomers: ', e)
             setIsLoading(false)
         }
     }
@@ -157,7 +163,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
             setIsLoading(false)
         }
         catch (e) {
-            console.log(e)
+            console.log('fetchDataRoomAvailables: ', e)
             setIsLoading(false)
         }
     }
@@ -225,6 +231,8 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
                 description: 'Vui lòng nhập đủ thông tin',
                 type: 'warning'
             })
+
+            Alert.alert('Thông báo', 'Vui lòng nhập đủ thông tin')
             setIsLoading(false)
             return
         }
@@ -271,6 +279,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
                         type: 'success'
                     })
                     setIsLoading(false)
+                    dispatch(updateContracts(Math.random()))
                     onClose()
                 }
 
@@ -281,6 +290,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
                     description: 'Tạo phiếu thuê thất bại',
                     type: 'danger'
                 })
+                onClose()
                 setIsLoading(false)
                 console.log('Lỗi khi cố tạo 1 contract:', e)
             }
@@ -299,7 +309,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
                         data={dropDownRooms}
                         onSelect={(value) => handleChangeValue('roomId', value)}
                         renderItem={(item, index) => renderItemDropDown(item, index)}
-                        selected={contract.roomId || 'Chọn phòng'}
+                        selected={contract?.roomId || 'Chọn phòng'}
                     />
 
                     <SpaceComponent height={14} />

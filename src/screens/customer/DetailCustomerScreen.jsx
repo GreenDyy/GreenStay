@@ -1,9 +1,10 @@
-import { View, Text, Image } from 'react-native'
+import { CallCalling, Card, Edit, Messages2 } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
-import { CircleComponent, ContainerComponent, HeaderComponent, LoadingModalComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import { Image, View } from 'react-native'
 import { apiCustomer } from '../../apis/apiDTHome'
+import { CircleComponent, ContainerComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import { appColors } from '../../constants/appColors'
-import { Edit } from 'iconsax-react-native'
+import { appFonts } from '../../constants/appFonts'
 import { images } from '../../constants/images'
 import AddNewCustomerModal from './AddNewCustomerModal'
 
@@ -72,8 +73,39 @@ const DetailCustomerScreen = ({ navigation, route }) => {
                 <TextComponent text={customer?.customerName} isTitle />
             </SectionComponent>
 
+            {/* body */}
             <SectionComponent>
-                <TextComponent text={customer?.customerName} />
+                <RowComponent style={{ justifyContent: 'flex-start', borderBottomWidth: 0.5, borderBottomColor: appColors.gray2, paddingVertical: 5 }}>
+                    <Card size={30} color={appColors.primary} variant='Bold' />
+                    <SpaceComponent width={10} />
+                    <View>
+                        <TextComponent text='CMND/CCCD' fontFamily={appFonts.boldOpenSans} />
+                        <TextComponent text={customer?.citizenId} fontFamily={appFonts.mediumOpenSans} color={appColors.gray} fontSize={13} />
+                    </View>
+                </RowComponent>
+
+                <SpaceComponent height={14} />
+
+                <RowComponent style={{ justifyContent: 'flex-start', borderBottomWidth: 0.5, borderBottomColor: appColors.gray2, paddingVertical: 5 }}>
+                    <Messages2 size={30} color={appColors.primary} variant='Bold' />
+                    <SpaceComponent width={10} />
+                    <View>
+                        <TextComponent text='Email' fontFamily={appFonts.boldOpenSans} />
+                        <TextComponent text={customer?.phoneNumber} fontFamily={appFonts.mediumOpenSans} color={appColors.gray} fontSize={13} />
+                    </View>
+                </RowComponent>
+
+                <SpaceComponent height={14} />
+
+                <RowComponent style={{ justifyContent: 'flex-start', borderBottomWidth: 0.5, borderBottomColor: appColors.gray2, paddingVertical: 5 }}>
+                    <CallCalling size={30} color={appColors.primary} variant='Bold' />
+                    <SpaceComponent width={10} />
+                    <View>
+                        <TextComponent text='Số điện thoại' fontFamily={appFonts.boldOpenSans} />
+                        <TextComponent text={customer?.citizenId} fontFamily={appFonts.mediumOpenSans} color={appColors.gray} fontSize={13} />
+                    </View>
+                </RowComponent>
+
             </SectionComponent>
 
             <AddNewCustomerModal actionType={'update'} customerId={customerId} visible={isShowModalCustomerUpdate} onClose={() => setIsShowModalCustomerUpdate(false)} />

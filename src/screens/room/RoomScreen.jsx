@@ -10,27 +10,43 @@ import { appFonts } from '../../constants/appFonts';
 import { images } from '../../constants/images';
 import { globalStyle } from '../../styles/globalStyle';
 import AddNewRoomModal from './AddNewRoomModal';
+import { useSelector } from 'react-redux';
 
 const RoomScreen = ({ navigation, route }) => {
   const [isGrid, setIsGird] = useState(true)
   const [searchKey, setSearchKey] = useState('')
   const [dataRooms, setDataRooms] = useState([])
+  const [dataRoomOriginals, setDataRoomOriginals] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isShowModalAdd, setIsShowModalAdd] = useState(false)
+
+  const checkUpdateRoom = useSelector(state => state.roomReducer.updatedValue)
 
   useEffect(() => {
     if (!isShowModalAdd) {
       fetchDataRooms()
     }
-  }, [isShowModalAdd])
+  }, [isShowModalAdd, checkUpdateRoom])
 
   useEffect(() => {
-    const reFetchData = navigation.addListener('focus', () => {
-      fetchDataRooms(); // Cập nhật dữ liệu khi quay lại màn hình
-    });
+    if (searchKey) {
+      const filteredData = dataRoomOriginals.filter(room =>
+        room.roomName.toLowerCase().includes(searchKey.toLowerCase())
+      )
+      setDataRooms(filteredData)
+    }
+    else {
+      setDataRooms(dataRoomOriginals)
+    }
+  }, [searchKey])
 
-    return reFetchData;
-  }, []);
+  // useEffect(() => {
+  //   const reFetchData = navigation.addListener('focus', () => {
+  //     fetchDataRooms(); // Cập nhật dữ liệu khi quay lại màn hình
+  //   });
+
+  //   return reFetchData;
+  // }, []);
 
   const fetchDataRooms = async () => {
     const url = '/get-all';
@@ -64,6 +80,7 @@ const RoomScreen = ({ navigation, route }) => {
         }
       }
       setDataRooms(newDataRooms)
+      setDataRoomOriginals(newDataRooms)
       setIsLoading(false)
     } catch (error) {
       console.error('Lỗi api khi fetch data rooms:', error);

@@ -1,7 +1,7 @@
 import HomeScreen from "./home/HomeScreen"
+import SplashScreen from "./SplashScreen"
 import CustomerScreen from "./customer/CustomerScreen"
 import RoomScreen from "./room/RoomScreen"
-import SplashScreen from "./SplashScreen"
 import LoginScreen from "./auth/LoginScreen"
 import SignUpScreen from "./auth/SignUpScreen"
 
@@ -16,6 +16,7 @@ import DetailContractScreen from "./contract/DetailContractScreen"
 //invoice
 import InvoidceScreen from "./invoice/InvoidceScreen"
 import InvoiceWithStatusScreen from "./invoice/InvoiceWithStatusScreen"
+import DetailInvoiceScreen from "./invoice/DetailInvoiceScreen"
 
 
 export {
@@ -34,6 +35,7 @@ export {
     DetailContractScreen,
     InvoidceScreen,
     InvoiceWithStatusScreen,
+    DetailInvoiceScreen,
     ContractWithStatusScreen,
 
 

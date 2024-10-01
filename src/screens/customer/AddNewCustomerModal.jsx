@@ -10,6 +10,8 @@ import storage from '@react-native-firebase/storage';
 import { appInfors } from '../../constants/appInfors'
 import { images } from '../../constants/images'
 import { useNavigation } from '@react-navigation/native'
+import { useDispatch } from 'react-redux'
+import { updateCustomers } from '../../srcRedux/reducers/customerReducer'
 
 const testData = [
     {
@@ -47,6 +49,8 @@ const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
     const navigation = useNavigation()
 
     const refImage = useRef()
+
+    const dispatch = useDispatch()
 
     useEffect(() => {
         if (actionType === 'update') {
@@ -128,6 +132,8 @@ const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
                 description: 'Vui lòng nhập đủ thông tin',
                 type: 'warning'
             })
+
+            Alert.alert('Thông báo', 'Vui lòng nhập đủ thông tin')
             setIsLoading(false)
             return
         }
@@ -155,6 +161,7 @@ const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
                 })
                 setDataCustomer(initCustomer)
                 setIsLoading(false)
+                dispatch(updateCustomers(Math.random()))
                 onClose()
             }
             catch {
@@ -193,6 +200,7 @@ const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
                 type: "success",
             })
             setIsLoading(false)
+            dispatch(updateCustomers(Math.random()))
             onClose()
         }
         catch {
@@ -257,14 +265,17 @@ const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
                                 description: "Xoá khách hàng thành công",
                                 type: "success",
                             });
+                            dispatch(updateCustomers(Math.random()))
                             setIsLoading(false)
+                            onClose()
                         } catch (e) {
                             console.log('Xoá khách hàng thất bại');
                             showMessage({
                                 message: "Thông báo",
-                                description: "Xoá khách hàng thất bại",
+                                description: "Xoá khách hàng thất bại do khách này đang thuê",
                                 type: "danger",
                             });
+                            onClose()
                             setIsLoading(false)
                         }
                         setIsLoading(false);
@@ -282,7 +293,7 @@ const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
                 {actionType === 'create'
                     ? <HeaderComponent text='Thêm khách hàng' isBack customIsBack={onClose} />
                     :
-                    <HeaderComponent text='Thông tin khách hàng' isBack customIsBack={onClose} 
+                    <HeaderComponent text='Thông tin khách hàng' isBack customIsBack={onClose}
                         buttonRight={<Trash size={20} color={appColors.danger} />}
                         onRightPress={handleDeleteCustomer}
                     />}
