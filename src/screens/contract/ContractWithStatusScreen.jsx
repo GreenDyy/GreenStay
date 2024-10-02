@@ -17,6 +17,8 @@ const ContractWithStatusScreen = ({ navigation, route }) => {
     const checkUpdate = useSelector((state) => state.contractReducer.contractData)
     const [isRefreshing, setIsRefreshing] = useState(false)
 
+    const authData = useSelector((state) => state.authReducer.authData)
+
     useEffect(() => {
         fetchContracts()
     }, [checkUpdate])
@@ -30,16 +32,15 @@ const ContractWithStatusScreen = ({ navigation, route }) => {
     const fetchContracts = async () => {
         setIsLoading(true)
         try {
-            const contracts = await apiRental(`/get-all`)
+            const contracts = await apiRental(`/${authData.ownerId}/get-all`)
             const newContracts = []
 
             for (const contract of contracts) {
                 //lấy customer nhét vào contracts
-                const cus = await apiCustomer(`/${contract.customerId}`)
+                const cus = await apiCustomer(`/${authData.ownerId}/${contract.customerId}`)
                 //lấy phòng nhét vào contracts
-                const room = await apiRoom(`/${contract.roomId}`)
+                const room = await apiRoom(`/${authData.ownerId}/${contract.roomId}`)
                 newContracts.push({ ...contract, customer: cus, room: room })
-                console.log('toi day roi', room)
             }
 
             setContracts(newContracts)

@@ -1,13 +1,12 @@
-import { View, Text, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { ButtonComponent, ContainerComponent, HeaderComponent, LoadingModalComponent, SectionComponent, TextComponent } from '../../components'
 import { Printer } from 'iconsax-react-native';
-import { appColors } from '../../constants/appColors';
-import { getDateStringType2, printBillPdf } from '../../utils/Utils';
+import React, { useEffect, useState } from 'react';
 import { showMessage } from 'react-native-flash-message';
+import { useDispatch, useSelector } from 'react-redux';
 import { apiInvoice, apiPower, apiTrash, apiWater } from '../../apis/apiDTHome';
+import { ButtonComponent, ContainerComponent, HeaderComponent, LoadingModalComponent, SectionComponent, TextComponent } from '../../components';
+import { appColors } from '../../constants/appColors';
 import { updateInvoices } from '../../srcRedux/reducers/invoiceReducer';
-import { useDispatch } from 'react-redux';
+import { getDateStringType2, printBillPdf } from '../../utils/Utils';
 
 const initData = {
     invoiceId: 3,
@@ -45,6 +44,7 @@ const DetailInvoiceScreen = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(false)
 
     const dispatch = useDispatch()
+    const authData = useSelector((state) => state.authReducer.authData)
 
     useEffect(() => {
         setInvoice(item)
@@ -57,9 +57,9 @@ const DetailInvoiceScreen = ({ navigation, route }) => {
     const handlePrintPdf = async () => {
         setIsLoading(true)
         try {
-            const water = await apiWater(`/latest-price`)
-            const power = await apiPower(`/latest-price`)
-            const trash = await apiTrash(`/latest-price`)
+            const water = await apiWater(`/${authData.ownerId}/latest-price`)
+            const power = await apiPower(`/${authData.ownerId}/latest-price`)
+            const trash = await apiTrash(`/${authData.ownerId}/latest-price`)
 
             const dataPrint = {
                 customerName: invoice.customer.customerName,

@@ -1,11 +1,9 @@
-import { View, Text } from 'react-native'
-import React from 'react'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import { ContractScreen, HomeScreen, ContractWithStatusScreen, InvoidceScreen, RoomScreen } from '../screens'
-import { Book, House2 } from 'iconsax-react-native'
+import React from 'react'
 import { TextComponent } from '../components'
-import { appFonts } from '../constants/appFonts'
 import { appColors } from '../constants/appColors'
+import { appFonts } from '../constants/appFonts'
+import { ContractWithStatusScreen } from '../screens'
 
 const ContractTopTabNavigator = () => {
     const Tab = createMaterialTopTabNavigator()

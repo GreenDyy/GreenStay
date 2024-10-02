@@ -10,20 +10,8 @@ import storage from '@react-native-firebase/storage';
 import { appInfors } from '../../constants/appInfors'
 import { images } from '../../constants/images'
 import { useNavigation } from '@react-navigation/native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { updateCustomers } from '../../srcRedux/reducers/customerReducer'
-
-const testData = [
-    {
-        photoUrl: 'https://i.pinimg.com/564x/fb/68/7f/fb687f993380c1dc5a2a23f5d46b49dd.jpg',
-    },
-    {
-        photoUrl: 'https://i.pinimg.com/564x/fb/68/7f/fb687f993380c1dc5a2a23f5d46b49dd.jpg',
-    },
-    {
-        photoUrl: 'https://i.pinimg.com/564x/fb/68/7f/fb687f993380c1dc5a2a23f5d46b49dd.jpg',
-    },
-]
 
 const initCustomer = {
     "customerName": "",
@@ -37,6 +25,7 @@ const initCustomer = {
     "anotherPhotoUrl": "",
     createdAt: new Date(),
     updatedAt: new Date(),
+    ownerId: '',
 }
 
 const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
@@ -51,6 +40,7 @@ const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
     const refImage = useRef()
 
     const dispatch = useDispatch()
+    const authData = useSelector((state) => state.authReducer.authData)
 
     useEffect(() => {
         if (actionType === 'update') {
@@ -74,14 +64,14 @@ const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
     //quản lý thông tin khách hàng thay đổi
 
     const handleChangeValue = (key, value) => {
-        let tempData = { ...dataCustomer }
+        let tempData = { ...dataCustomer, ownerId: authData.ownerId }
         tempData[key] = value
         setDataCustomer(tempData)
     }
 
     const fetchDataRoom = async () => {
         try {
-            const res = await apiCustomer(`/${customerId}`)
+            const res = await apiCustomer(`/${authData.ownerId}/${customerId}`)
             setDataCustomer(res)
         }
         catch (e) {
@@ -170,6 +160,7 @@ const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
                     description: "Thêm khách thất bại",
                     type: "danger",
                 })
+                onClose()
                 setIsLoading(false)
             }
         }
@@ -209,6 +200,7 @@ const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
                 description: "Sửa thông tin khách thất bại",
                 type: "danger",
             })
+            onClose()
             setIsLoading(false)
         }
     }

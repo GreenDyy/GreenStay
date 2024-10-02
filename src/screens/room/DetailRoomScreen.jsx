@@ -12,6 +12,7 @@ import { checkNamNhuan, getDate, getDateStringType1 } from '../../utils/Utils'
 import AddInvoiceModal from '../invoice/AddInvoiceModal'
 import AddNewRoomModal from './AddNewRoomModal'
 import AddContractModal from '../contract/AddContractModal'
+import { useSelector } from 'react-redux'
 
 const initRoom = {
     "roomId": 0,
@@ -37,6 +38,8 @@ const DetailRoomScreen = ({ navigation, route }) => {
     const [isShowModalRoomUpdate, setIsShowModalRoomUpdate] = useState(false)
     const [isShowModalContractAdd, setIsShowModalContractAdd] = useState(false)
 
+    const authData = useSelector((state) => state.authReducer.authData)
+
     //các trường hợp cần refesh data
     useEffect(() => {
         if (!isShowModalRoomUpdate) {
@@ -46,8 +49,6 @@ const DetailRoomScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         if (dataRoom !== initRoom) {
-            console.log("dataRoom.isAvailable:", dataRoom.isAvailable, dataRoom.roomId);
-            console.log('fetchRental dc gọi')
             fetchRental()
         }
     }, [dataRoom])
@@ -55,7 +56,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
     const fetchRental = async () => {
         try {
             if (!dataRoom.isAvailable) {
-                const res = await apiRental(`/get-by-room-and-status/${roomId}/true`)
+                const res = await apiRental(`/${authData.ownerId}/get-by-room-and-status/${roomId}/true`)
                 if (res && res.startDate) {
                     setStartDate(new Date(res.startDate));
                     fetchDataMemberOfRoom()
@@ -75,7 +76,7 @@ const DetailRoomScreen = ({ navigation, route }) => {
     const fetchDataRoom = async () => {
         setIsLoading(true)
         try {
-            const data = await apiRoom(`/${roomId}`)
+            const data = await apiRoom(`/${authData.ownerId}/${roomId}`)
             setDataRoom(data)
             console.log('data room nè: ', data)
             setIsLoading(false)
@@ -90,11 +91,11 @@ const DetailRoomScreen = ({ navigation, route }) => {
         setIsLoading(true)
         try {
             if (!dataRoom.isAvailable) {
-                const rental = await apiRental(`/get-by-room-and-status/${roomId}/true`);
-                const members = await apiMemberOfRental(`/get-all-by-rental/${rental.rentalId}`);
+                const rental = await apiRental(`/${authData.ownerId}/get-by-room-and-status/${roomId}/true`);
+                const members = await apiMemberOfRental(`/${authData.ownerId}/get-all-by-rental/${rental.rentalId}`);
                 const newMembers = []
                 for (const customer of members) {
-                    const cus = await apiCustomer(`/${customer.customerId}`)
+                    const cus = await apiCustomer(`/${authData.ownerId}/${customer.customerId}`)
                     newMembers.push({ ...cus })
                 }
                 console.log('cus nè:', newMembers)

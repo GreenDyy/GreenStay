@@ -2,11 +2,13 @@ import { View, Text } from 'react-native'
 import React, { useState } from 'react'
 import { ButtonComponent, ContainerComponent, HeaderComponent, SectionComponent, TextComponent } from '../../components'
 import { appColors } from '../../constants/appColors'
+import { useSelector } from 'react-redux'
 
 const DetailContractScreen = ({ navigation, route }) => {
     const { item } = route.params
     const [contract, setContract] = useState(item)
 
+    const authData = useSelector((state) => state.authReducer.authData)
 
     return (
         <ContainerComponent>

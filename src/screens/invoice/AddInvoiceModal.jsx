@@ -2,17 +2,14 @@ import { ClipboardClose, ClipboardTick } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
 import { Alert, Image, Modal, TouchableOpacity } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
-import RNFS from 'react-native-fs'
-import RNHTMLtoPDF from 'react-native-html-to-pdf'
+import { useDispatch, useSelector } from 'react-redux'
 import { apiCustomer, apiInvoice, apiPower, apiRental, apiRoom, apiTrash, apiWater } from '../../apis/apiDTHome'
 import { ButtonComponent, CircleComponent, ContainerComponent, DropDownComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import InputComponent from '../../components/InputComponent'
 import { appColors } from '../../constants/appColors'
 import { images } from '../../constants/images'
-import htmlInvoice from './htmlInvoice'
-import { getDateStringType2, printBillPdf } from '../../utils/Utils'
-import { useDispatch } from 'react-redux'
 import { updateInvoices } from '../../srcRedux/reducers/invoiceReducer'
+import { getDateStringType2, printBillPdf } from '../../utils/Utils'
 
 const initInvoice = {
     "rentalId": "",
@@ -28,29 +25,24 @@ const initInvoice = {
     "powerEnd": "",
     "waterUsage": "",
     "powerUsage": "",
+    "ownerId": ""
 }
 
 const AddInvoiceModal = ({ roomId, visible, onClose }) => {
     const [invoice, setInvoice] = useState(initInvoice)
     const [room, setRoom] = useState(null)
     const [customer, setCustomer] = useState(null)
-
     const [waterMoney, setWaterMoney] = useState(0)
     const [powerMoney, setPowerMoney] = useState(0)
     const [trashMoney, setTrashMoney] = useState(0)
     const [totalAmount, setTotalAmount] = useState(0);
-
     const [waterPricePerUnit, setWaterPricePerUnit] = useState(0)
     const [powerPricePerUnit, setPowerPricePerUnit] = useState(0)
-
     const [dropDownRooms, setDropDownRooms] = useState([])
-
     const [isLoading, setIsLoading] = useState(false)
-    const [isFormValid, setIsFormValid] = useState(false)
-    const [messError, setMessError] = useState('')
     const [isExportInvoice, setIsExportInvoice] = useState(false)
-    const [pdfPath, setPdfPath] = useState(null)
-
+    
+    const authData = useSelector((state) => state.authReducer.authData)
     const dispatch = useDispatch()
 
     //lấy roomId lun nếu nó dc truyền từ màn khác
@@ -69,11 +61,11 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
     //sau khi chọn phòng khác thì load data phòng đó để lấy thông tin cần thiết như power, waterUsage, rentalId
     useEffect(() => {
         const fetchDataRoom = async () => {
-            const res = await apiRoom(`/${invoice.roomId}`)
+            const res = await apiRoom(`/${authData.ownerId}/${invoice.roomId}`)
             setRoom(res)
         }
         const fetchDataRentalAndCus = async () => {
-            const res = await apiRental(`/get-by-room-and-status/${invoice.roomId}/true`)
+            const res = await apiRental(`/${authData.ownerId}/get-by-room-and-status/${invoice.roomId}/true`)
             setInvoice(preInvoice => (
                 {
                     ...preInvoice,
@@ -84,7 +76,7 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
 
 
             if (res) {
-                const cus = await apiCustomer(`/${res.customerId}`)
+                const cus = await apiCustomer(`/${authData.ownerId}/${res.customerId}`)
                 setCustomer(cus)
             }
         }
@@ -100,12 +92,6 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
     useEffect(() => {
         console.log(invoice)
     }, [invoice])
-    useEffect(() => {
-        if (isExportInvoice)
-            console.log('bạn chọn xuất bill')
-        else
-            console.log('bạn chọn ko xuất bill')
-    }, [isExportInvoice])
 
     //tính tiền nước sau khi waterUsage thay đổi
     useEffect(() => {
@@ -120,11 +106,11 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
 
     const fetchDataWaterPowerTrash = async () => {
         try {
-            const water = await apiWater(`/latest-price`)
+            const water = await apiWater(`/${authData.ownerId}/latest-price`)
             setWaterPricePerUnit(water.pricePerUnit)
-            const power = await apiPower(`/latest-price`)
+            const power = await apiPower(`/${authData.ownerId}/latest-price`)
             setPowerPricePerUnit(power.pricePerUnit)
-            const trash = await apiTrash(`/latest-price`)
+            const trash = await apiTrash(`/${authData.ownerId}/latest-price`)
             setTrashMoney(trash.pricePerUnit)
         }
         catch (e) {
@@ -136,7 +122,7 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
     const fetchDataRoomAvailables = async () => {
         setIsLoading(true)
         try {
-            const res = await apiRoom(`/get-all`)
+            const res = await apiRoom(`/${authData.ownerId}/get-all`)
             const newRooms = res.filter((item) => !item.isAvailable)
             const rooms = newRooms.map((item) => ({
                 label: item.roomName,
@@ -153,9 +139,8 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
         }
     }
 
-
     const handleChangeValue = (key, value,) => {
-        let tempData = { ...invoice }
+        let tempData = { ...invoice, ownerId: authData.ownerId }
         tempData[key] = value
         setInvoice(tempData)
     }

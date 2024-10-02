@@ -8,7 +8,7 @@ import { appColors } from '../../constants/appColors'
 import { Image as ImageIcon, Trash } from 'iconsax-react-native'
 import storage from '@react-native-firebase/storage';
 import { useNavigation } from '@react-navigation/native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { updateRooms } from '../../srcRedux/reducers/roomReducer'
 
 const initRoom = {
@@ -20,6 +20,7 @@ const initRoom = {
   isVailable: true,
   createdAt: new Date(),
   updatedAt: new Date(),
+  ownerId: ''
 }
 
 const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
@@ -29,6 +30,7 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
   const navigation = useNavigation()
 
   const dispatch = useDispatch()
+  const authData = useSelector((state) => state.authReducer.authData)
 
   useEffect(() => {
     if (actionType === 'update') {
@@ -40,14 +42,14 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
   }, [dataRoom])
 
   const handleChangeValue = (key, value) => {
-    let tempData = { ...dataRoom }
+    let tempData = { ...dataRoom, ownerId: authData.ownerId }
     tempData[key] = value
     setDataRoom(tempData)
   }
 
   const fetchDataRoom = async () => {
     try {
-      const res = await apiRoom(`/${roomId}`)
+      const res = await apiRoom(`/${authData.ownerId}/${roomId}`)
       setDataRoom(res)
     }
     catch (e) {
@@ -91,9 +93,7 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
   }
 
   const handleCreateNewRoom = async () => {
-    const url = '/create'
     setIsLoading(true)
-
     if (!dataRoom.roomName || !dataRoom.roomPrice) {
       showMessage({
         message: 'Thông báo',
@@ -108,10 +108,13 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
       let newDataRoom = { ...dataRoom }
       if (imageSelected) {
         const downloadURL = await upLoadImage();
-        newDataRoom = { ...dataRoom, photoUrl: downloadURL }
+        newDataRoom = {
+          ...dataRoom,
+          photoUrl: downloadURL,
+        }
       }
-
-      await apiRoom(url, newDataRoom, 'post')
+      console.log('data trc khi them: ', newDataRoom)
+      await apiRoom(`/create`, newDataRoom, 'post')
 
       showMessage({
         message: "Thông báo",
@@ -123,12 +126,14 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
       dispatch(updateRooms(Math.random()))
       onClose()
     }
-    catch {
+    catch (e) {
       showMessage({
         message: "Thông báo",
         description: "Thêm phòng thất bại",
         type: "danger",
       })
+      onClose()
+      console.error(data)
       setIsLoading(false)
     }
   }
@@ -139,7 +144,11 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
       let newDataRoom = { ...dataRoom }
       if (imageSelected) {
         const downloadURL = await upLoadImage();
-        newDataRoom = { ...dataRoom, photoUrl: downloadURL, updatedAt: new Date() }
+        newDataRoom = {
+          ...dataRoom,
+          photoUrl: downloadURL,
+          updatedAt: new Date()
+        }
       }
       await apiRoom(`/update/${roomId}`, newDataRoom, 'put')
       showMessage({
@@ -159,6 +168,7 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
         type: "danger",
       })
       setIsLoading(false)
+      onClose()
     }
   }
 

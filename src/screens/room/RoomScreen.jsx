@@ -21,6 +21,7 @@ const RoomScreen = ({ navigation, route }) => {
   const [isShowModalAdd, setIsShowModalAdd] = useState(false)
 
   const checkUpdateRoom = useSelector(state => state.roomReducer.updatedValue)
+  const authData = useSelector((state) => state.authReducer.authData)
 
   useEffect(() => {
     if (!isShowModalAdd) {
@@ -49,22 +50,20 @@ const RoomScreen = ({ navigation, route }) => {
   // }, []);
 
   const fetchDataRooms = async () => {
-    const url = '/get-all';
     try {
       setIsLoading(true)
       const newDataRooms = []
-      const res = await apiRoom(url)
+      const res = await apiRoom(`/${authData.ownerId}/get-all`)
 
       for (const room of res) {
         if (!room.isAvailable) {
           try {
-            const rental = await apiRental(`/get-by-room-and-status/${room.roomId}/true`);
-
-            const members = await apiMemberOfRental(`/get-all-by-rental/${rental.rentalId}`);
+            const rental = await apiRental(`/${authData.ownerId}/get-by-room-and-status/${room.roomId}/true`);
+            const members = await apiMemberOfRental(`/${authData.ownerId}/get-all-by-rental/${rental.rentalId}`);
 
             const newMembers = []
             for (const customer of members) {
-              const cus = await apiCustomer(`/${customer.customerId}`)
+              const cus = await apiCustomer(`/${authData.ownerId}/${customer.customerId}`)
               newMembers.push({ ...cus })
             }
             newDataRooms.push({ ...room, members: newMembers });
@@ -87,10 +86,6 @@ const RoomScreen = ({ navigation, route }) => {
       setIsLoading(false)
     }
   }
-
-  // useEffect(() => {
-  //   console.log('ds room nè:', dataRooms)
-  // }, [dataRooms])
 
   const handleDetailRoom = (roomId) => {
     navigation.navigate('DetailRoomScreen', { roomId: roomId })

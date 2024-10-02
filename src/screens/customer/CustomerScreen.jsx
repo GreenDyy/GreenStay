@@ -19,6 +19,7 @@ const CustomerScreen = ({ navigation, route }) => {
   const [isShowModalAdd, setIsShowModalAdd] = useState(false)
 
   const checkUpdateCustomer = useSelector(state => state.customerReducer.updatedValue)
+  const authData = useSelector((state) => state.authReducer.authData)
 
   useEffect(() => {
     if (!isShowModalAdd) {
@@ -49,7 +50,7 @@ const CustomerScreen = ({ navigation, route }) => {
   const fetchDataCustomers = async () => {
     setIsLoading(true)
     try {
-      const res = await apiCustomer(`/get-all`, null, 'get')
+      const res = await apiCustomer(`/${authData.ownerId}/get-all`)
       setDataCustomers(res)
       setDataCustomerOriginals(res)
       setIsLoading(false)

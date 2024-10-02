@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
+import { useSelector } from 'react-redux'
 import { apiCustomer, apiInvoice, apiRoom } from '../../apis/apiDTHome'
 import { ContainerComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
-import { getDateStringType1, getDateStringType2 } from '../../utils/Utils'
-import { useDispatch, useSelector } from 'react-redux'
+import { getDateStringType2 } from '../../utils/Utils'
 
 const InvoiceWithStatusScreen = ({ navigation, route }) => {
     const invoicesRedux = useSelector((state) => state.invoiceReducer.invoiceData)
@@ -13,6 +13,8 @@ const InvoiceWithStatusScreen = ({ navigation, route }) => {
     const [invoices, setInvoices] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [isRefreshing, setIsRefreshing] = useState(false)
+
+    const authData = useSelector((state) => state.authReducer.authData)
 
     useEffect(() => {
         fetchInvoices()
@@ -30,14 +32,14 @@ const InvoiceWithStatusScreen = ({ navigation, route }) => {
     const fetchInvoices = async () => {
         setIsLoading(true)
         try {
-            const res = await apiInvoice(`/get-all`)
+            const res = await apiInvoice(`/${authData.ownerId}/get-all`)
             const newInvoices = []
 
             for (const invoice of res) {
                 //lấy customer nhét vào invoices
-                const cus = await apiCustomer(`/${invoice.customerId}`)
+                const cus = await apiCustomer(`/${authData.ownerId}/${invoice.customerId}`)
                 //lấy phòng nhét vào invoices
-                const room = await apiRoom(`/${invoice.roomId}`)
+                const room = await apiRoom(`/${authData.ownerId}/${invoice.roomId}`)
                 newInvoices.push({ ...invoice, customer: cus, room: room })
             }
 

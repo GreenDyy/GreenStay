@@ -5,23 +5,26 @@ import { ButtonComponent, ContainerComponent, HeaderComponent, LoadingModalCompo
 import InputComponent from '../../components/InputComponent'
 import { apiPower, apiTrash, apiWater } from '../../apis/apiDTHome'
 import { showMessage } from 'react-native-flash-message'
+import { useSelector } from 'react-redux'
 
 const DetailPriceModal = ({ visible, onClose, typePrice }) => {
     const [detailPrice, setDetailPrice] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
+
+    const authData = useSelector((state) => state.authReducer.authData)
 
     useEffect(() => {
         const fetchData = async () => {
             let res = null
             switch (typePrice) {
                 case 'water':
-                    res = await apiWater(`/latest-price`)
+                    res = await apiWater(`/${authData.ownerId}/latest-price`)
                     break
                 case 'power':
-                    res = await apiPower(`/latest-price`)
+                    res = await apiPower(`/${authData.ownerId}/latest-price`)
                     break
                 case 'trash':
-                    res = await apiTrash(`/latest-price`)
+                    res = await apiTrash(`/${authData.ownerId}/latest-price`)
                     break
                 default:
                     break
@@ -37,13 +40,13 @@ const DetailPriceModal = ({ visible, onClose, typePrice }) => {
 
 
     const handleChangeValue = (key, value) => {
-        let tempData = { ...detailPrice }
+        let tempData = { ...detailPrice, ownerId: authData.ownerId }
         tempData[key] = value
         setDetailPrice(tempData)
     }
 
     const handleChangeValueNumber = (key, value) => {
-        let tempData = { ...detailPrice }
+        let tempData = { ...detailPrice, ownerId: authData.ownerId }
         const numericText = value.replace(/[^0-9]/g, '')
         tempData[key] = numericText
         setDetailPrice(tempData)

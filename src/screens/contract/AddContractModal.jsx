@@ -1,24 +1,30 @@
-import { Book, Check, TickCircle } from 'iconsax-react-native'
+import { TickCircle } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
 import { Alert, Image, Modal } from 'react-native'
+import { showMessage } from 'react-native-flash-message'
+import { useDispatch, useSelector } from 'react-redux'
 import { apiCustomer, apiMemberOfRental, apiRental, apiRoom } from '../../apis/apiDTHome'
 import { ButtonComponent, CircleComponent, ContainerComponent, DropDownComponent, DropDownMultibleSelectComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import InputComponent from '../../components/InputComponent'
 import { appColors } from '../../constants/appColors'
-import { showMessage } from 'react-native-flash-message'
 import { images } from '../../constants/images'
-import AddNewCustomerModal from '../customer/AddNewCustomerModal'
-import { useDispatch } from 'react-redux'
 import { updateContracts } from '../../srcRedux/reducers/contractReducer'
+import AddNewCustomerModal from '../customer/AddNewCustomerModal'
+import { updateRooms } from '../../srcRedux/reducers/roomReducer'
 //các bảng sẽ tương tác: Rental, Customer maybe, Room, MemberOfRental
 
 const initContract = {
-
+    "roomId": "",
+    "customerId": "",
+    "startDate": new Date(),
+    "isRenting": true,
+    "createdAt": new Date(),
+    "updatedAt": new Date(),
+    "ownerId": ""
 }
 
 const AddContractModal = ({ visible, onClose, roomId }) => {
     const [isLoading, setIsLoading] = useState(false)
-    const [isFormValid, setIsFormValid] = useState(false)
     const [contract, setContract] = useState(initContract)
     //chỉ lấy khách hàng hiện đang ko thuê
     const [dropDownCustomers, setDropDownCustomers] = useState([])
@@ -36,11 +42,11 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
     const [isShowModalCustomerAdd, setIsShowModalCustomerAdd] = useState(false)
 
     const dispatch = useDispatch()
+    const authData = useSelector((state) => state.authReducer.authData)
 
     //lấy roomId lun nếu nó dc truyền từ màn khác
     useEffect(() => {
         if (roomId) {
-            console.log('tao đã tự lấy roomId nè: ', roomId)
             handleChangeValue('roomId', roomId)
             setContract(preData => ({ ...preData, roomId: roomId }))
         }
@@ -60,7 +66,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
     //khi có id người dại điện thì fetch cái này
     useEffect(() => {
         const fetchRepresentative = async () => {
-            const res = await apiCustomer(`/${contract.customerId}`)
+            const res = await apiCustomer(`/${authData.ownerId}/${contract.customerId}`)
             setRepresentative(res)
         }
         if (contract.customerId) {
@@ -79,7 +85,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
         const fetchMembers = async () => {
             const listNameMembers = []
             for (const customerId of listMemberSelected) {
-                const res = await apiCustomer(`/${customerId}`)
+                const res = await apiCustomer(`/${authData.ownerId}/${customerId}`)
                 listNameMembers.push(res.customerName)
             }
             setMemberNames(listNameMembers)
@@ -93,7 +99,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
             const fetchMembers = async () => {
                 const listMemberSelecteds = []
                 for (const customerId of listMemberSelected) {
-                    const res = await apiCustomer(`/${customerId}`)
+                    const res = await apiCustomer(`/${authData.ownerId}/${customerId}`)
                     listMemberSelecteds.push(res)
 
                 }
@@ -102,8 +108,6 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
                     value: item.customerId,
                     photoUrl: item.photoUrl
                 }))
-
-
                 setDropDownRepresentatives(newListMembers)
             }
             fetchMembers()
@@ -115,16 +119,16 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
         setIsLoading(true)
         try {
             //lấy data all
-            const res = await apiCustomer(`/get-all`)
+            const res = await apiCustomer(`/${authData.ownerId}/get-all`)
             //lọc data
             const listIdCusCurrentNoRental = []
 
-            const rentals = await apiRental(`/get-all`)
+            const rentals = await apiRental(`/${authData.ownerId}/get-all`)
             const rentalCurents = await rentals.filter((rental) => rental.isRenting)
 
             //lấy các th đang thuê trong từng phòng ra
             for (const rental of rentalCurents) {
-                const memberInRooms = await apiMemberOfRental(`/get-all-by-rental/${rental.rentalId}`)
+                const memberInRooms = await apiMemberOfRental(`/${authData.ownerId}/get-all-by-rental/${rental.rentalId}`)
                 for (const member of memberInRooms) {
                     listIdCusCurrentNoRental.push(member.customerId)
                 }
@@ -151,7 +155,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
     const fetchDataRoomAvailables = async () => {
         setIsLoading(true)
         try {
-            const res = await apiRoom(`/get-all`)
+            const res = await apiRoom(`/${authData.ownerId}/get-all`)
             const newRooms = res.filter((item) => item.isAvailable)
             const rooms = newRooms.map((item) => ({
                 label: item.roomName,
@@ -169,7 +173,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
     }
 
     const handleChangeValue = (key, value) => {
-        let tempData = { ...contract }
+        let tempData = { ...contract, ownerId: authData.ownerId }
         tempData[key] = value
         setContract(tempData)
     }
@@ -244,14 +248,13 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
                     isRenting: true,
                     startDate: new Date(),
                     updatedAt: new Date(),
-
                 }
                 console.log('full data rental trc khi them nè:', newContract)
                 const rentalCreateRes = await apiRental(`/create`, newContract, 'post')
 
                 //B2 cập nhật isVisible, waterAfter, powerAfter trong Room
                 if (rentalCreateRes) {
-                    const room = await apiRoom(`/${contract.roomId}`)
+                    const room = await apiRoom(`/${authData.ownerId}/${contract.roomId}`)
                     const newDataRoom = {
                         ...room,
                         waterAfter: waterStart,
@@ -268,7 +271,8 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
                         let dataMember = {
                             "rentalId": lastRentalId,
                             "customerId": customerId,
-                            "roleMember": "string"
+                            "roleMember": "no role",
+                            "ownerId": newContract.ownerId
                         }
                         await apiMemberOfRental(`/create`, dataMember, 'post')
                     }
@@ -280,6 +284,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
                     })
                     setIsLoading(false)
                     dispatch(updateContracts(Math.random()))
+                    dispatch(updateRooms(Math.random()))
                     onClose()
                 }
 
@@ -293,6 +298,7 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
                 onClose()
                 setIsLoading(false)
                 console.log('Lỗi khi cố tạo 1 contract:', e)
+                onClose()
             }
         }
     }

@@ -57,6 +57,20 @@ const apiInvoice = async (url, data = null, method = 'get') => {
     })
 }
 
+const apiOwnerBuilding = async (url, data = null, method = 'get') => {
+    return await axiosClient(`/OwnerBuilding${url}`, {
+        method: method ?? 'get',
+        data,
+    })
+}
+
+const apiOwnerAccount = async (url, data = null, method = 'get') => {
+    return await axiosClient(`/OwnerAccount${url}`, {
+        method: method ?? 'get',
+        data,
+    })
+}
+
 export {
     apiRoom,
     apiCustomer,
@@ -66,4 +80,6 @@ export {
     apiPower,
     apiTrash,
     apiWater,
+    apiOwnerAccount,
+    apiOwnerBuilding,
 }

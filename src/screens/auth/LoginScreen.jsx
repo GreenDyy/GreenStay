@@ -6,6 +6,8 @@ import { Image } from 'react-native'
 import { images } from '../../constants/images'
 import { useDispatch } from 'react-redux'
 import { addAuth } from '../../srcRedux/reducers/authReducer'
+import { apiOwnerAccount } from '../../apis/apiDTHome'
+import { showMessage } from 'react-native-flash-message'
 
 const LoginScreen = ({ navigation }) => {
     const [phoneNumber, setPhoneNumber] = useState('')
@@ -21,18 +23,51 @@ const LoginScreen = ({ navigation }) => {
     const handleLogin = async () => {
         setIsLoading(true)
         try {
-            const authData = {
-                id: 0,
-                phoneNumber: phoneNumber,
-                accessToken: 'laytubackend'
+            //check rỗng
+            if (!phoneNumber || !password) {
+                showMessage({
+                    message: 'Thông báo',
+                    description: 'Vui lòng nhập đầy đủ thông tin',
+                    type: 'warning'
+                })
+                setIsLoading(false)
+                return
             }
-            dispatch(addAuth(authData))
-            await setDataStorage('authData', authData)
+            const res = await apiOwnerAccount(`/login`, { phoneNumber, password }, 'post')
+            if (res) {
+                const authData = {
+                    ownerId: res.ownerId,
+                    ownerName: res.ownerName,
+                    email: res.email,
+                    phoneNumber: res.phoneNumber,
+                    photoUrl: res.photoUrl,
+                    accessToken: 'laytubackend'
+                }
+                dispatch(addAuth(authData))
 
+                await setDataStorage('authData', authData)
+
+                showMessage({
+                    message: 'Thông báo',
+                    description: 'Đăng nhập thành công',
+                    type: 'success'
+                })
+            }
+            else {
+                showMessage({
+                    message: 'Thông báo',
+                    description: 'Số điện thoại hoặc mật khẩu không chính xác',
+                    type: 'danger'
+                })
+            }
             setIsLoading(false)
         }
         catch (error) {
-            console.error('Error during login:', error)
+            showMessage({
+                message: 'Thông báo',
+                description: 'Số điện thoại hoặc mật khẩu không chính xác',
+                type: 'danger'
+            })
             setIsLoading(false)
         }
     }
@@ -44,6 +79,7 @@ const LoginScreen = ({ navigation }) => {
             <SectionComponent>
                 <InputComponent
                     title='Số điện thoại'
+                    placeholder='Nhập số điện thoại'
                     value={phoneNumber}
                     keyboardType='number-pad'
                     onChangeText={val => setPhoneNumber(val)}
@@ -54,6 +90,7 @@ const LoginScreen = ({ navigation }) => {
                 <SpaceComponent height={14} />
                 <InputComponent
                     title='Mật khẩu'
+                      placeholder='Nhập mật khẩu'
                     value={password}
                     keyboardType='number-pad'
                     onChangeText={val => setPassword(val)}

@@ -62,17 +62,19 @@ const HomeScreen = ({ navigation }) => {
 
   const checkUpdateCustomer = useSelector((state) => state.customerReducer.updatedValue)
   const checkUpdateRoom = useSelector((state) => state.roomReducer.updatedValue)
+  const authData = useSelector((state) => state.authReducer.authData)
+
   const dispatch = useDispatch()
 
   useEffect(() => {
     const countRoom = async () => {
-      const rooms = await apiRoom(`/get-all`)
+      const rooms = await apiRoom(`/${authData.ownerId}/get-all`)
       setTotalRoom(rooms.length)
       const roomEmptys = rooms.filter(room => room.isAvailable)
       setTotalRoomEmpty(roomEmptys.length)
     }
     const countCustomer = async () => {
-      const customers = await apiCustomer(`/get-all`)
+      const customers = await apiCustomer(`/${authData.ownerId}/get-all`)
       setTotalCustomer(customers.length)
     }
     countRoom()

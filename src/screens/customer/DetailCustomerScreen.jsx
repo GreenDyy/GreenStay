@@ -7,6 +7,7 @@ import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
 import { images } from '../../constants/images'
 import AddNewCustomerModal from './AddNewCustomerModal'
+import { useSelector } from 'react-redux'
 
 const initCustomer = {
     "customerId": 1,
@@ -31,6 +32,8 @@ const DetailCustomerScreen = ({ navigation, route }) => {
     const [isLoading, setIsLoading] = useState(false)
     const [isShowModalCustomerUpdate, setIsShowModalCustomerUpdate] = useState(false)
 
+    const authData = useSelector((state) => state.authReducer.authData)
+
     useEffect(() => {
         if (!isShowModalCustomerUpdate)
             fetchcustomer()
@@ -39,7 +42,7 @@ const DetailCustomerScreen = ({ navigation, route }) => {
     const fetchcustomer = async () => {
         setIsLoading(true)
         try {
-            const res = await apiCustomer(`/${customerId}`)
+            const res = await apiCustomer(`/${authData.ownerId}/${customerId}`)
             setCustomer(res)
             console.log(res)
             setIsLoading(false)
