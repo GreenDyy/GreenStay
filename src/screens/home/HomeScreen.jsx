@@ -1,21 +1,19 @@
-import { ArrowCircleDown, Book, Briefcase, Building4, CpuCharge, DollarCircle, Drop, Electricity, Flash, House, House2, Notification, Trash, Wind } from 'iconsax-react-native'
+import Geolocation from '@react-native-community/geolocation'
+import axios from 'axios'
+import { ArrowCircleDown, Book, Briefcase, DollarCircle, Drop, Flash, Notification, Trash } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
-import { Alert, FlatList, Image, View } from 'react-native'
+import { Alert, Image, View } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import { apiCustomer, apiRoom } from '../../apis/apiDTHome'
 import { CardComponent, CircleComponent, ContainerComponent, RowComponent, SectionComponent, SpaceComponent, SquareBorderComponent, TabBarComponent, TextComponent } from '../../components'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import Icon from 'react-native-vector-icons/Ionicons';
-import { removeItemDataStorage } from '../../utils/Utils'
-import axios from 'axios'
-import { useDispatch, useSelector } from 'react-redux'
+import { appInfors } from '../../constants/appInfors'
+import { images } from '../../constants/images'
 import { removeAuth } from '../../srcRedux/reducers/authReducer'
 import { globalStyle } from '../../styles/globalStyle'
-import { appInfors } from '../../constants/appInfors'
-import { Text } from 'react-native-svg'
+import { removeItemDataStorage } from '../../utils/Utils'
 import DetailPriceModal from './DetailPriceModal'
-import { apiCustomer, apiRoom } from '../../apis/apiDTHome'
-import Geolocation from '@react-native-community/geolocation'
 
 const categoryData = [
   {
@@ -152,14 +150,19 @@ const HomeScreen = ({ navigation }) => {
     }
   }
 
+  const handleLogout = () => {
+    dispatch(removeAuth())
+    removeItemDataStorage('authData')
+  }
+
   return (
     <ContainerComponent isScroll>
       {/* //header */}
       <SectionComponent>
 
         <RowComponent>
-          <CircleComponent onPress={() => dispatch(removeAuth())}>
-            <Image source={{ uri: 'https://i.pinimg.com/474x/04/07/6f/04076f13be66528ea4bf7dc8d13a3e63.jpg' }} style={{ height: 40, width: 40 }} resizeMode='cover' />
+          <CircleComponent onPress={handleLogout}>
+            <Image source={authData.photoUrl ? { uri: authData.photoUrl } : images.avatar_null} style={{ height: 40, width: 40 }} resizeMode='cover' />
           </CircleComponent>
 
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>

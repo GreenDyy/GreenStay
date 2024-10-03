@@ -17,8 +17,8 @@ const LoginScreen = ({ navigation }) => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-
-    }, [])
+        console.log('data login:', phoneNumber, password)
+    }, [phoneNumber, password])
 
     const handleLogin = async () => {
         setIsLoading(true)
@@ -44,9 +44,7 @@ const LoginScreen = ({ navigation }) => {
                     accessToken: 'laytubackend'
                 }
                 dispatch(addAuth(authData))
-
                 await setDataStorage('authData', authData)
-
                 showMessage({
                     message: 'Thông báo',
                     description: 'Đăng nhập thành công',
@@ -68,6 +66,7 @@ const LoginScreen = ({ navigation }) => {
                 description: 'Số điện thoại hoặc mật khẩu không chính xác',
                 type: 'danger'
             })
+            console.log(error)
             setIsLoading(false)
         }
     }

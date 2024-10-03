@@ -1,16 +1,16 @@
-import { View, Text, Image, Alert, FlatList, Modal } from 'react-native'
+import storage from '@react-native-firebase/storage'
+import { useNavigation } from '@react-navigation/native'
+import { GalleryAdd, Trash } from 'iconsax-react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import { ButtonComponent, CardComponent, CircleComponent, ContainerComponent, DateTimePickerComponent, HeaderComponent, ImagePickerComponent, LoadingModalComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
-import InputComponent from '../../components/InputComponent'
-import { apiCustomer, apiRoom } from '../../apis/apiDTHome'
+import { Alert, Image, Modal } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
+import { useDispatch, useSelector } from 'react-redux'
+import { apiCustomer } from '../../apis/apiDTHome'
+import { ButtonComponent, CircleComponent, ContainerComponent, DateTimePickerComponent, HeaderComponent, ImagePickerComponent, LoadingModalComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import InputComponent from '../../components/InputComponent'
 import { appColors } from '../../constants/appColors'
-import { Edit, Trash } from 'iconsax-react-native'
-import storage from '@react-native-firebase/storage';
 import { appInfors } from '../../constants/appInfors'
 import { images } from '../../constants/images'
-import { useNavigation } from '@react-navigation/native'
-import { useDispatch, useSelector } from 'react-redux'
 import { updateCustomers } from '../../srcRedux/reducers/customerReducer'
 
 const initCustomer = {
@@ -307,7 +307,7 @@ const AddNewCustomerModal = ({ customerId, actionType, visible, onClose }) => {
                         }
                         <CircleComponent size={35} style={{ position: 'absolute', top: 0, left: appInfors.sizes.WIDTH * 0.17, backgroundColor: appColors.primary }}
                             onPress={() => { refImage.current.open() }}>
-                            <Edit size={22} color={appColors.white} variant='Broken' />
+                            <GalleryAdd size={22} color={appColors.white} variant='Broken' />
                         </CircleComponent>
                     </CircleComponent>
 
