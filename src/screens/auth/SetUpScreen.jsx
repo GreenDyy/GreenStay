@@ -1,6 +1,6 @@
 import { View, Text, Image } from 'react-native'
 import React, { useRef, useState } from 'react'
-import { ButtonComponent, CircleComponent, ContainerComponent, HeaderComponent, ImagePickerComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import { ButtonComponent, CircleComponent, ContainerComponent, HeaderComponent, ImagePickerComponent, LoadingModalComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import { appColors } from '../../constants/appColors'
 import InputComponent from '../../components/InputComponent'
 import { images } from '../../constants/images'
@@ -9,6 +9,8 @@ import { appInfors } from '../../constants/appInfors'
 import storage from '@react-native-firebase/storage'
 import { showMessage } from 'react-native-flash-message'
 import { apiOwnerAccount, apiOwnerBuilding } from '../../apis/apiDTHome'
+import { addAuth } from '../../srcRedux/reducers/authReducer'
+import { setDataStorage } from '../../utils/Utils'
 
 const initOwner = {
   "ownerName": "",
@@ -86,16 +88,19 @@ const SetUpScreen = ({ navigation, route }) => {
         //   newDataOwner = { ...owner, photoUrl: avatarUrl }
         // }
 
+        //B1 tạo profile
         let profile = {
           ownerName: owner.ownerName,
           email: owner.email,
           phoneNumber: phoneNumber,
-          photoUrl: await upLoadImage(imageSelected) || "",
+          photoUrl: imageSelected ? await upLoadImage(imageSelected) : "",
           createdAt: owner.createdAt,
           updatedAt: owner.updatedAt
         }
         const resProfile = await apiOwnerBuilding(`/create`, profile, 'post')
+        console.log('đã tạo xog profile')
         if (resProfile) {
+          //B2 tạo account
           let account = {
             ownerId: resProfile.ownerId,
             phoneNumber: phoneNumber,
@@ -103,21 +108,46 @@ const SetUpScreen = ({ navigation, route }) => {
             createdAt: owner.createdAt,
             updatedAt: owner.updatedAt
           }
-          await apiOwnerAccount(`/create`, account, 'post')
-          showMessage({
-            message: "Thông báo",
-            description: "Thêm khách thành công",
-            type: "success",
-          })
-          setOwner(initOwner)
+          const resAccount = await apiOwnerAccount(`/create`, account, 'post')
+          console.log('đã tạo xog account')
+          if (resAccount) {
+            //B3 tiến hành login 
+            setOwner(initOwner)
+            const res = await apiOwnerAccount(`/login`, { phoneNumber, password: owner.password }, 'post')
+            if (res) {
+              const authData = {
+                ownerId: res.ownerId,
+                ownerName: res.ownerName,
+                email: res.email,
+                phoneNumber: res.phoneNumber,
+                photoUrl: res.photoUrl,
+                accessToken: 'laytubackend'
+              }
+              dispatch(addAuth(authData))
+              await setDataStorage('authData', authData)
+              showMessage({
+                message: 'Thông báo',
+                description: 'Đăng nhập thành công',
+                type: 'success'
+              })
+            }
+            else {
+              showMessage({
+                message: 'Thông báo',
+                description: 'Số điện thoại hoặc mật khẩu không chính xác',
+                type: 'danger'
+              })
+            }
+          }
         }
       }
-      catch {
+      catch (e) {
         showMessage({
           message: "Thông báo",
-          description: "Thêm khách thất bại",
+          description: "Đăng ký tài khoản thất bại",
           type: "danger",
         })
+        console.error(e)
         setIsLoading(false)
       }
     }
@@ -204,8 +234,9 @@ const SetUpScreen = ({ navigation, route }) => {
       </SectionComponent>
 
       <SectionComponent>
-        <ButtonComponent text='Hoàn tất' onPress={handleCreateOwner}/>
+        <ButtonComponent text='Hoàn tất' onPress={handleCreateOwner} />
       </SectionComponent>
+      <LoadingModalComponent visible={isLoading} />
     </ContainerComponent>
   )
 }

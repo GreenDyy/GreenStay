@@ -71,6 +71,13 @@ const apiOwnerAccount = async (url, data = null, method = 'get') => {
     })
 }
 
+const apiSms = async (url, data = null, method = 'get') => {
+    return await axiosClient(`/TwilioSMS${url}`, {
+        method: method ?? 'get',
+        data,
+    })
+}
+
 export {
     apiRoom,
     apiCustomer,
@@ -82,4 +89,5 @@ export {
     apiWater,
     apiOwnerAccount,
     apiOwnerBuilding,
+    apiSms,
 }

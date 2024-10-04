@@ -1,7 +1,7 @@
 import { Dimensions } from "react-native";
 
 //chạy ngrok http https://localhost:7095 để lấy public url
-const BASE_URL = 'https://c483-171-252-153-129.ngrok-free.app'
+const BASE_URL = 'https://b078-171-252-153-129.ngrok-free.app'
 // const BASE_URL = process.env.BASE_URL
 
 export const appInfors = {
