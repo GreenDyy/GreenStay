@@ -1,5 +1,5 @@
 import { View, Text, Image } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { ButtonComponent, CircleComponent, ContainerComponent, HeaderComponent, ImagePickerComponent, LoadingModalComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
 import { appColors } from '../../constants/appColors'
 import InputComponent from '../../components/InputComponent'
@@ -8,9 +8,10 @@ import { Edit, GalleryAdd } from 'iconsax-react-native'
 import { appInfors } from '../../constants/appInfors'
 import storage from '@react-native-firebase/storage'
 import { showMessage } from 'react-native-flash-message'
-import { apiOwnerAccount, apiOwnerBuilding } from '../../apis/apiDTHome'
+import { apiOwnerAccount, apiOwnerBuilding, apiPower, apiTrash, apiWater } from '../../apis/apiDTHome'
 import { addAuth } from '../../srcRedux/reducers/authReducer'
 import { setDataStorage } from '../../utils/Utils'
+import { useDispatch } from 'react-redux'
 
 const initOwner = {
   "ownerName": "",
@@ -21,6 +22,9 @@ const initOwner = {
   "updatedAt": new Date(),
   "password": "",
   "rePassword": "",
+  pricePower: "",
+  priceWater: "",
+  priceTrash: ""
 }
 
 const SetUpScreen = ({ navigation, route }) => {
@@ -30,6 +34,8 @@ const SetUpScreen = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const refImage = useRef()
+
+  const dispatch = useDispatch()
 
   const handleChangeValue = (key, value) => {
     let temp = { ...owner }
@@ -72,7 +78,8 @@ const SetUpScreen = ({ navigation, route }) => {
 
   const handleCreateOwner = async () => {
     setIsLoading(true)
-    if (!owner.ownerName || !owner.password) {
+    //chặn chưa nhập đủ thông tin
+    if (!owner.ownerName || !owner.password || !owner.rePassword || !owner.pricePower || !owner.priceTrash || !owner.priceWater) {
       showMessage({
         message: 'Thông báo',
         description: 'Vui lòng nhập đủ thông tin',
@@ -83,11 +90,6 @@ const SetUpScreen = ({ navigation, route }) => {
     }
     else {
       try {
-        // if (imageSelected) {
-        //   const avatarUrl = await upLoadImage(imageSelected);
-        //   newDataOwner = { ...owner, photoUrl: avatarUrl }
-        // }
-
         //B1 tạo profile
         let profile = {
           ownerName: owner.ownerName,
@@ -111,7 +113,27 @@ const SetUpScreen = ({ navigation, route }) => {
           const resAccount = await apiOwnerAccount(`/create`, account, 'post')
           console.log('đã tạo xog account')
           if (resAccount) {
-            //B3 tiến hành login 
+            //B3 tạo các giá thành phần ban đầu cho dãy trọ
+
+            await apiPower(`/create`, {
+              pricePerUnit: owner.pricePower,
+              effectiveDate: new Date(),
+              ownerId: resProfile.ownerId
+            }, 'post')
+
+            await apiWater(`/create`, {
+              pricePerUnit: owner.priceWater,
+              effectiveDate: new Date(),
+              ownerId: resProfile.ownerId
+            }, 'post')
+
+            await apiTrash(`/create`, {
+              pricePerUnit: owner.priceTrash,
+              effectiveDate: new Date(),
+              ownerId: resProfile.ownerId
+            }, 'post')
+            
+            //B4 tiến hành login 
             setOwner(initOwner)
             const res = await apiOwnerAccount(`/login`, { phoneNumber, password: owner.password }, 'post')
             if (res) {
@@ -154,7 +176,7 @@ const SetUpScreen = ({ navigation, route }) => {
   }
 
   return (
-    <ContainerComponent>
+    <ContainerComponent isScroll >
       <HeaderComponent isBack />
       <SectionComponent>
         <TextComponent text='Thiết lập thông tin' isTitle fontSize={32} style={{ textAlign: 'center' }} />
@@ -216,7 +238,7 @@ const SetUpScreen = ({ navigation, route }) => {
           value={owner?.password}
           keyboardType='number-pad'
           onChangeText={val => handleChangeValue('password', val)}
-          allowClear
+          isPassword
           isRequire
         />
 
@@ -228,6 +250,42 @@ const SetUpScreen = ({ navigation, route }) => {
           value={owner?.rePassword}
           keyboardType='number-pad'
           onChangeText={val => handleChangeValue('rePassword', val)}
+          isPassword
+          isRequire
+        />
+
+        <SpaceComponent height={14} />
+
+        <InputComponent
+          title='Giá điện'
+          placeholder='Nhập giá điện'
+          value={owner?.pricePower}
+          keyboardType='number-pad'
+          onChangeText={val => handleChangeValue('pricePower', val)}
+          allowClear
+          isRequire
+        />
+
+        <SpaceComponent height={14} />
+
+        <InputComponent
+          title='Giá nước'
+          placeholder='Nhập giá nước'
+          value={owner?.priceWater}
+          keyboardType='number-pad'
+          onChangeText={val => handleChangeValue('priceWater', val)}
+          allowClear
+          isRequire
+        />
+
+        <SpaceComponent height={14} />
+
+        <InputComponent
+          title='Giá rác'
+          placeholder='Nhập giá rác'
+          value={owner?.priceTrash}
+          keyboardType='number-pad'
+          onChangeText={val => handleChangeValue('priceTrash', val)}
           allowClear
           isRequire
         />

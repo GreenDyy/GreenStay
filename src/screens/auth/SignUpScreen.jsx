@@ -61,6 +61,14 @@ const SignUpScreen = ({ navigation }) => {
   }
 
   const testFunc = async () => {
+    if(!phoneNumber) {
+      showMessage({
+        message: 'Thông báo',
+        description: 'Vui lòng nhập số điện thoại',
+        type: 'warning',
+      });
+      return
+    }
     try {
       const checkPhoneNumber = await apiOwnerBuilding(`/check-exist-phone-number/${phoneNumber}`);
       if (!checkPhoneNumber.status) {
@@ -76,7 +84,12 @@ const SignUpScreen = ({ navigation }) => {
       navigation.navigate('SetUpScreen', { phoneNumber })
     }
     catch (e) {
-      console.error(e)
+      showMessage({
+        message: 'Thông báo',
+        description: 'Số điện thoại không khả dụng',
+        type: 'warning',
+      });
+      setIsLoading(false);
     }
   }
 

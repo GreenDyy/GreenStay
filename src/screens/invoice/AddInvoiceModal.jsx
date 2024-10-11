@@ -1,6 +1,6 @@
 import { ClipboardClose, ClipboardTick } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
-import { Alert, Image, Modal, TouchableOpacity } from 'react-native'
+import { Alert, Image, Modal, TouchableOpacity, View } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
 import { useDispatch, useSelector } from 'react-redux'
 import { apiCustomer, apiInvoice, apiPower, apiRental, apiRoom, apiTrash, apiWater } from '../../apis/apiDTHome'
@@ -10,6 +10,7 @@ import { appColors } from '../../constants/appColors'
 import { images } from '../../constants/images'
 import { updateInvoices } from '../../srcRedux/reducers/invoiceReducer'
 import { getDateStringType2, printBillPdf } from '../../utils/Utils'
+import { appFonts } from '../../constants/appFonts'
 
 const initInvoice = {
     "rentalId": "",
@@ -23,8 +24,8 @@ const initInvoice = {
     "waterEnd": "",
     "powerStart": "",
     "powerEnd": "",
-    "waterUsage": "",
-    "powerUsage": "",
+    "waterUsage": "0",
+    "powerUsage": "0",
     "ownerId": ""
 }
 
@@ -41,7 +42,7 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
     const [dropDownRooms, setDropDownRooms] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [isExportInvoice, setIsExportInvoice] = useState(false)
-    
+
     const authData = useSelector((state) => state.authReducer.authData)
     const dispatch = useDispatch()
 
@@ -311,10 +312,21 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
 
                 <SectionComponent>
                     {customer &&
-                        <>
-                            <TextComponent text={`Người đại điện: ${customer?.customerName}`} />
-                            <SpaceComponent height={14} />
-                        </>}
+                        <SectionComponent style={{ alignItems: 'center' }}>
+                            <CircleComponent size={80} style={{ overflow: 'visible' }} >
+                                {
+                                    customer.photoUrl
+                                        ?
+                                        <Image source={{ uri: customer.photoUrl }} style={{ height: 80, width: 80, borderRadius: 999 }} resizeMode='cover' />
+                                        :
+                                        <Image source={images.avatar_null} style={{ height: 80, width: 80, borderRadius: 999 }} resizeMode='cover' />
+
+                                }
+                            </CircleComponent>
+                            <SpaceComponent height={8} />
+                            <TextComponent text={customer?.customerName} isTitle fontSize={16} color={appColors.primary2}/>
+                        </SectionComponent>
+                    }
 
                     <DropDownComponent title='Phòng'
                         //data sẽ dc lấy từ danh sách các khách chọn ở trên nhen
@@ -351,34 +363,6 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
 
                     />
                     <SpaceComponent height={14} />
-                    <RowComponent>
-                        <TextComponent text={`Điện cũ: ${room?.powerAfter}`} />
-                        <TextComponent text={`Điện mới: ${invoice?.powerEnd}`} />
-                        <TextComponent text={`Điện sử dụng: ${invoice?.powerUsage}`} />
-                    </RowComponent>
-                    <SpaceComponent height={14} />
-
-                    <RowComponent>
-                        <TextComponent text={`Nước cũ: ${room?.waterAfter}`} />
-                        <TextComponent text={`Nước mới: ${invoice?.waterEnd}`} />
-                        <TextComponent text={`Nước sử dụng: ${invoice?.waterUsage}`} />
-                    </RowComponent>
-
-                    <SpaceComponent height={14} />
-                    <TextComponent text={`Tiền nước: ${waterMoney}`} />
-                    <SpaceComponent height={14} />
-                    <TextComponent text={`Tiền điện: ${powerMoney}`} />
-                    <SpaceComponent height={14} />
-                    <TextComponent text={`Tiền rác: ${trashMoney}`} />
-                    <SpaceComponent height={14} />
-                    <TextComponent text={`Tiền phòng: ${room?.roomPrice ?? 0}`} />
-                    <SpaceComponent height={14} />
-                    <TextComponent text={`Tổng tiền: ${totalAmount}`} />
-                    <SpaceComponent height={14} />
-                    <RowComponent>
-                        <TextComponent text={`Rental id: ${invoice.rentalId}`} />
-                        <TextComponent text={`Customer id: ${invoice.customerId}`} />
-                    </RowComponent>
                     <InputComponent
                         title='Ghi chú (Nếu có)'
                         value={invoice.description}
@@ -386,17 +370,46 @@ const AddInvoiceModal = ({ roomId, visible, onClose }) => {
                         allowClear
                         onChangeText={(value) => handleChangeValue('description', value)}
                     />
+                </SectionComponent>
+
+                <SectionComponent>
+                    <View style={{ width: '100%', borderTopWidth: 0.5, borderColor: appColors.gray, marginBottom: 8 }} />
+                    <TextComponent text='Chi tiết tính toán' isTitle style={{ textAlign: 'center' }} />
+                    <SpaceComponent height={14} />
+                    <RowComponent>
+                        <TextComponent text={`Điện cũ: ${room?.powerAfter}`} fontFamily={appFonts.mediumOpenSans} />
+                        <TextComponent text={`Điện mới: ${invoice?.powerEnd}`} fontFamily={appFonts.mediumOpenSans} />
+                        <TextComponent text={`Điện sử dụng: ${invoice?.powerUsage}`} fontFamily={appFonts.mediumOpenSans} />
+                    </RowComponent>
+                    <SpaceComponent height={14} />
+
+                    <RowComponent>
+                        <TextComponent text={`Nước cũ: ${room?.waterAfter}`} fontFamily={appFonts.mediumOpenSans} />
+                        <TextComponent text={`Nước mới: ${invoice?.waterEnd}`} fontFamily={appFonts.mediumOpenSans} />
+                        <TextComponent text={`Nước sử dụng: ${invoice?.waterUsage}`} fontFamily={appFonts.mediumOpenSans} />
+                    </RowComponent>
+
+                    <SpaceComponent height={14} />
+                    <TextComponent text={`Tiền nước: ${waterMoney?.toLocaleString()} VNĐ`} fontFamily={appFonts.mediumOpenSans} />
+                    <SpaceComponent height={14} />
+                    <TextComponent text={`Tiền điện: ${powerMoney?.toLocaleString()} VNĐ`} fontFamily={appFonts.mediumOpenSans} />
+                    <SpaceComponent height={14} />
+                    <TextComponent text={`Tiền rác: ${trashMoney?.toLocaleString()} VNĐ`} />
+                    <SpaceComponent height={14} />
+                    <TextComponent text={`Tiền phòng: ${room?.roomPrice?.toLocaleString() ?? 0} VNĐ`} fontFamily={appFonts.mediumOpenSans} />
+                    <SpaceComponent height={14} />
+                    <TextComponent text={`Tổng tiền: ${totalAmount ? totalAmount.toLocaleString() : 0} VNĐ`} fontFamily={appFonts.boldOpenSans} color={appColors.danger} />
+
                     <SpaceComponent height={14} />
 
                     <TouchableOpacity onPress={() => { setIsExportInvoice(preVal => !preVal) }}>
                         <RowComponent style={{ justifyContent: 'flex-start' }}>
-                            <TextComponent text='Xuất phiếu: ' />
+                            <TextComponent text='Xuất phiếu: ' fontFamily={appFonts.mediumOpenSans} />
                             {isExportInvoice ? <ClipboardTick size={22} color={appColors.primary} /> : <ClipboardClose size={22} color={appColors.danger} />}
                         </RowComponent>
                     </TouchableOpacity>
-
+                    <View style={{ width: '100%', borderTopWidth: 0.5, borderColor: appColors.gray, marginTop: 8 }} />
                 </SectionComponent>
-
 
                 <SectionComponent>
                     <ButtonComponent text='Tạo phiếu thu' onPress={handleCreateInvoice} />

@@ -33,15 +33,19 @@ const LoginScreen = ({ navigation }) => {
                 setIsLoading(false)
                 return
             }
-            const res = await apiOwnerAccount(`/login`, { phoneNumber, password }, 'post')
+            const res = await apiOwnerAccount(`/login`, {
+                phoneNumber: phoneNumber,
+                password: password
+            }, 'post')
             if (res) {
                 const authData = {
-                    ownerId: res.ownerId,
-                    ownerName: res.ownerName,
-                    email: res.email,
-                    phoneNumber: res.phoneNumber,
-                    photoUrl: res.photoUrl,
-                    accessToken: 'laytubackend'
+                    ownerId: res.account.ownerId,
+                    ownerName: res.account.ownerName,
+                    email: res.account.email,
+                    phoneNumber: res.account.phoneNumber,
+                    photoUrl: res.account.photoUrl,
+                    accessToken: res.accessToken.split(';')[0],
+                    expiresIn: res.accessToken.split(';')[1],
                 }
                 dispatch(addAuth(authData))
                 await setDataStorage('authData', authData)
@@ -71,6 +75,20 @@ const LoginScreen = ({ navigation }) => {
         }
     }
 
+    const testFunc = async () => {
+        try {
+            const res = await apiOwnerAccount(`/login`, {
+                "phoneNumber": "0767237493",
+                "password": "123"
+            }, 'post')
+            console.log(res.account)
+        }
+        catch (e) {
+            console.error(e)
+        }
+
+    }
+
     return (
         <ContainerComponent>
             <HeaderComponent />
@@ -89,7 +107,7 @@ const LoginScreen = ({ navigation }) => {
                 <SpaceComponent height={14} />
                 <InputComponent
                     title='Mật khẩu'
-                      placeholder='Nhập mật khẩu'
+                    placeholder='Nhập mật khẩu'
                     value={password}
                     keyboardType='number-pad'
                     onChangeText={val => setPassword(val)}
@@ -102,7 +120,7 @@ const LoginScreen = ({ navigation }) => {
             <SectionComponent>
                 <ButtonComponent text='Đăng nhập' onPress={handleLogin} style={{ borderRadius: 50 }} />
                 <SpaceComponent height={10} />
-                <ButtonComponent text='Quên mật khẩu?' type='link' onPress={handleLogin} style={{ color: 'black', alignSelf: 'center' }} />
+                <ButtonComponent text='Quên mật khẩu?' type='link' onPress={testFunc} style={{ color: 'black', alignSelf: 'center' }} />
 
             </SectionComponent>
 

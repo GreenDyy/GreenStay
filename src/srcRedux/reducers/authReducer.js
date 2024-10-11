@@ -6,7 +6,8 @@ const initialState = {
     email: '',
     phoneNumber: '',
     photoUrl: '',
-    accessToken: ''
+    accessToken: '',
+    expiresIn: ''
 }
 
 const authSlice = createSlice({

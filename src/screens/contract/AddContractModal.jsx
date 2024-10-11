@@ -118,39 +118,47 @@ const AddContractModal = ({ visible, onClose, roomId }) => {
     const fetchDataCustomers = async () => {
         setIsLoading(true)
         try {
-            //lấy data all
+            // Lấy data tất cả khách hàng
             const res = await apiCustomer(`/${authData.ownerId}/get-all`)
-            //lọc data
-            const listIdCusCurrentNoRental = []
-
+            console.log('Tất cả khách hàng:', res)
+            
+            // Lấy danh sách thuê phòng hiện tại
+            const listIdCusCurrentRental = []
+    
             const rentals = await apiRental(`/${authData.ownerId}/get-all`)
-            const rentalCurents = await rentals.filter((rental) => rental.isRenting)
-
-            //lấy các th đang thuê trong từng phòng ra
+            const rentalCurents = rentals.filter(rental => rental.isRenting)
+    
+            // Lấy danh sách khách hàng đang thuê
             for (const rental of rentalCurents) {
                 const memberInRooms = await apiMemberOfRental(`/${authData.ownerId}/get-all-by-rental/${rental.rentalId}`)
                 for (const member of memberInRooms) {
-                    listIdCusCurrentNoRental.push(member.customerId)
+                    listIdCusCurrentRental.push(member.customerId)
                 }
             }
-            console.log(listIdCusCurrentNoRental)
-
-            //sửa thuộc tính item
-
-            const customers = res.map((item) => ({
+    
+            console.log('Danh sách khách hàng đang thuê:', listIdCusCurrentRental)
+    
+            // Lọc danh sách khách hàng không thuê phòng
+            const listIdCusCurrentNoRental = res.filter(customer => !listIdCusCurrentRental.includes(customer.customerId))
+            
+            console.log('Khách hàng không thuê:', listIdCusCurrentNoRental)
+    
+            // Chuyển đổi data để hiển thị lên dropdown
+            const customers = listIdCusCurrentNoRental.map((item) => ({
                 label: item.customerName,
                 value: item.customerId,
                 photoUrl: item.photoUrl
             }))
-            //xong rồi mới setData để hiển thị ra dropdown
+    
+            // Set data cho dropdown
             setDropDownCustomers(customers)
             setIsLoading(false)
-        }
-        catch (e) {
+        } catch (e) {
             console.log('fetchDataCustomers: ', e)
             setIsLoading(false)
         }
     }
+    
 
     const fetchDataRoomAvailables = async () => {
         setIsLoading(true)

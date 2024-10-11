@@ -11,6 +11,7 @@ import { images } from '../../constants/images';
 import { globalStyle } from '../../styles/globalStyle';
 import AddNewRoomModal from './AddNewRoomModal';
 import { useSelector } from 'react-redux';
+import { Skeleton } from 'moti/skeleton';
 
 const RoomScreen = ({ navigation, route }) => {
   const [isGrid, setIsGird] = useState(true)
@@ -167,6 +168,10 @@ const RoomScreen = ({ navigation, route }) => {
           onChangeText={val => setSearchKey(val)}
         />
       </SectionComponent>
+
+      <Skeleton >
+
+      </Skeleton>
       <FlatList
         showsVerticalScrollIndicator={false}
         key={isGrid ? 'grid' : 'list'}

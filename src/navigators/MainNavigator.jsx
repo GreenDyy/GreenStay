@@ -6,12 +6,7 @@ import DrawerNavigator from './DrawerNavigator'
 const MainNavigator = () => {
     return (
         // <DrawerNavigator />
-        <>
-            <BottomTabNavigator />
-         
-        </>
-
-
+        <BottomTabNavigator />
     )
 }
 

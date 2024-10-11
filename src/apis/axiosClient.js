@@ -1,6 +1,7 @@
 import axios from "axios";
 import { appInfors } from "../constants/appInfors";
 import { showMessage } from "react-native-flash-message";
+import { getDataStorage } from "../utils/Utils";
 
 const axiosClient = axios.create({
     baseURL: appInfors.BASE_URL,
@@ -8,12 +9,13 @@ const axiosClient = axios.create({
 })
 
 //xử lý chặn từ request
-axiosClient.interceptors.request.use((config) => {
-    const token = 'token'
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+axiosClient.interceptors.request.use(async (config) => {
+    const authData = await getDataStorage('authData');
+    if (authData && authData.accessToken) {
+        config.headers.Authorization = `Bearer ${authData.accessToken}`;
+    } else {
+        delete config.headers.Authorization;
     }
-
     return config;
 })
 
