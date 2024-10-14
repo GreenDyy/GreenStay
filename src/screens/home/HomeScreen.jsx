@@ -2,7 +2,7 @@ import Geolocation from '@react-native-community/geolocation'
 import axios from 'axios'
 import { ArrowCircleDown, Book, Briefcase, DollarCircle, Drop, Flash, Notification, Trash } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
-import { Alert, Image, View } from 'react-native'
+import { Alert, Image, Modal, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { apiCustomer, apiRoom } from '../../apis/apiDTHome'
 import { CardComponent, CircleComponent, ContainerComponent, RowComponent, SectionComponent, SpaceComponent, SquareBorderComponent, TabBarComponent, TextComponent } from '../../components'
@@ -61,6 +61,8 @@ const HomeScreen = ({ navigation }) => {
   const checkUpdateCustomer = useSelector((state) => state.customerReducer.updatedValue)
   const checkUpdateRoom = useSelector((state) => state.roomReducer.updatedValue)
   const authData = useSelector((state) => state.authReducer.authData)
+
+  const [isShowDrawer, setIsShowDrawer] = useState(false)
 
   const dispatch = useDispatch()
 
@@ -161,7 +163,7 @@ const HomeScreen = ({ navigation }) => {
       <SectionComponent>
 
         <RowComponent>
-          <CircleComponent onPress={handleLogout}>
+          <CircleComponent onPress={() => setIsShowDrawer(true)}>
             <Image source={authData.photoUrl ? { uri: authData.photoUrl } : images.avatar_null} style={{ height: 40, width: 40 }} resizeMode='cover' />
           </CircleComponent>
 
@@ -248,6 +250,30 @@ const HomeScreen = ({ navigation }) => {
         </RowComponent>
       </SectionComponent>
       <DetailPriceModal visible={isShowModalPrice} onClose={() => setIsShowModalPrice(false)} typePrice={typePrice} />
+      {/* //thêm drawer mà lỗi hoài bất lực quá làm tạm cái này :(( */}
+      <Modal
+        visible={isShowDrawer}
+
+        transparent
+        statusBarTranslucent>
+
+        <View style={[globalStyle.container, { backgroundColor: 'rgba(0, 0, 0, 0.5)', alignItems: 'center', justifyContent: 'center' }]}>
+          <RowComponent style={{ flex: 1 }}>
+            <View style={{ width: '50%', backgroundColor: 'white', height: '100%', borderTopRightRadius: 10, borderBottomRightRadius: 10, paddingVertical: 40 }}>
+              <SectionComponent>
+                <TouchableOpacity onPress={handleLogout}>
+                  <TextComponent text='Đăng xuất' />
+                </TouchableOpacity>
+
+              </SectionComponent>
+            </View>
+
+            <TouchableOpacity style={{ width: '50%', backgroundColor: 'rgba(0, 0, 0, 0.5)', height: '100%' }} onPress={() => setIsShowDrawer(false)}>
+
+            </TouchableOpacity>
+          </RowComponent>
+        </View>
+      </Modal>
     </ContainerComponent>
   )
 }

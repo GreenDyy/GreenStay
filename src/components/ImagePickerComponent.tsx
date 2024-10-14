@@ -1,12 +1,14 @@
-import { View, Modal, StyleProp, ViewStyle, TouchableOpacity } from 'react-native';
-import React, { useImperativeHandle, useState, forwardRef, ReactNode } from 'react';
-import ButtonComponent from './ButtonComponent';
-import TextComponent from './TextComponent';
-import { globalStyle } from '../styles/globalStyle';
+import { Camera, CloseSquare, Gallery } from 'iconsax-react-native';
+import React, { forwardRef, ReactNode, useImperativeHandle, useState } from 'react';
+import { Modal, Pressable, StyleProp, TouchableOpacity, View, ViewStyle } from 'react-native';
 import ImageCropPicker, { Options } from 'react-native-image-crop-picker';
 import { appColors } from '../constants/appColors';
+import { appInfors } from '../constants/appInfors';
+import { globalStyle } from '../styles/globalStyle';
+import CircleComponent from './CircleComponent';
 import RowComponent from './RowComponent';
 import SpaceComponent from './SpaceComponent';
+import TextComponent from './TextComponent';
 
 interface Props {
     onSelect: (val: any) => void;
@@ -69,8 +71,8 @@ const ImagePickerComponent = forwardRef((props: Props, ref) => {
             <Modal
                 visible={isShowModal}
                 statusBarTranslucent
-                style={{ flex: 1 }}
                 transparent
+                animationType='slide'
             >
                 <View style={[
                     globalStyle.container,
@@ -80,15 +82,41 @@ const ImagePickerComponent = forwardRef((props: Props, ref) => {
                         alignItems: 'center',
                     },
                 ]}>
+                    <Pressable style={{ flex: 1, width: appInfors.sizes.WIDTH }} onPress={() => setIsShowModal(false)}/>
+
                     <View style={{
-                        flex: 1,
-                        marginTop: 300,
+                        width: appInfors.sizes.WIDTH,
+                        minHeight: appInfors.sizes.HEIGHT * 0.2,
+                        backgroundColor: appColors.white,
                         justifyContent: 'center',
-                        alignItems: 'center'
+                        borderTopRightRadius: 15,
+                        borderTopLeftRadius: 15,
+                        padding: 10,
                     }}>
-                        <ButtonComponent text='Chọn từ thư viện' onPress={() => handleChoiceImage('library')} />
-                        <ButtonComponent text='Camera' onPress={() => handleChoiceImage('camera')} />
-                        <ButtonComponent text='Huỷ' onPress={() => setIsShowModal(false)} />
+                        <RowComponent style={{ justifyContent: 'flex-start' }} onPress={() => handleChoiceImage('library')}>
+                            <CircleComponent size={30} color={appColors.gray2}>
+                                <Gallery size={18} color={appColors.text} variant='Bold' />
+                            </CircleComponent>
+                            <SpaceComponent width={10} />
+                            <TextComponent text='Chọn từ thư viện' />
+                        </RowComponent>
+                        <SpaceComponent height={20} />
+                        <RowComponent style={{ justifyContent: 'flex-start' }} onPress={() => handleChoiceImage('camera')}>
+                            <CircleComponent size={30} color={appColors.gray2}>
+                                <Camera size={18} color={appColors.text} variant='Bold' />
+                            </CircleComponent>
+                            <SpaceComponent width={10} />
+                            <TextComponent text='Camera' />
+                        </RowComponent>
+                        <SpaceComponent height={20} />
+                        <RowComponent style={{ justifyContent: 'flex-start' }} onPress={() => setIsShowModal(false)}>
+                            <CircleComponent size={30} color={appColors.gray2}>
+                                <CloseSquare size={18} color={appColors.text} variant='Bold' />
+                            </CircleComponent>
+                            <SpaceComponent width={10} />
+                            <TextComponent text='Huỷ' />
+                        </RowComponent>
+
                     </View>
                 </View>
             </Modal>

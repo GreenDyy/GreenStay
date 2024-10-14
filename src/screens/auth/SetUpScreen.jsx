@@ -138,13 +138,14 @@ const SetUpScreen = ({ navigation, route }) => {
             const res = await apiOwnerAccount(`/login`, { phoneNumber, password: owner.password }, 'post')
             if (res) {
               const authData = {
-                ownerId: res.ownerId,
-                ownerName: res.ownerName,
-                email: res.email,
-                phoneNumber: res.phoneNumber,
-                photoUrl: res.photoUrl,
-                accessToken: 'laytubackend'
-              }
+                ownerId: res.account.ownerId,
+                ownerName: res.account.ownerName,
+                email: res.account.email,
+                phoneNumber: res.account.phoneNumber,
+                photoUrl: res.account.photoUrl,
+                accessToken: res.accessToken.split(';')[0],
+                expiresIn: res.accessToken.split(';')[1],
+            }
               dispatch(addAuth(authData))
               await setDataStorage('authData', authData)
               showMessage({
