@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { useSelector } from 'react-redux'
 import { apiCustomer, apiInvoice, apiRoom } from '../../apis/apiDTHome'
-import { ContainerComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import { ContainerComponent, LoadingEmptyModalComponent, LoadingModalComponent, RowComponent, SectionComponent, SkeletonComponent, SpaceComponent, TextComponent } from '../../components'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
 import { getDateStringType2 } from '../../utils/Utils'
@@ -78,6 +78,28 @@ const InvoiceWithStatusScreen = ({ navigation, route }) => {
         )
     }
 
+    const renderSkeleton = () => {
+        return (
+            <RowComponent style={{ borderBottomColor: appColors.gray2, borderBottomWidth: 1, padding: 14 }}>
+                <View>
+                    <SkeletonComponent height={10} width={80} />
+                    <SpaceComponent height={5} />
+                    <SkeletonComponent height={14} width={100} />
+                    <SpaceComponent height={5} />
+                    <SkeletonComponent height={10} width={65} />
+                </View>
+
+                <View style={{ alignItems: 'flex-end' }}>
+                    <SkeletonComponent height={14} width={140} />
+                    <SpaceComponent height={5} />
+                    <SkeletonComponent height={10} width={50} />
+                    <SpaceComponent height={5} />
+                    <SkeletonComponent height={10} width={80} />
+                </View>
+            </RowComponent>
+        )
+    }
+
     const onRefresh = () => {
         setIsRefreshing(true)
         fetchInvoices()
@@ -88,14 +110,31 @@ const InvoiceWithStatusScreen = ({ navigation, route }) => {
         <ContainerComponent style={{ marginTop: 10 }}>
             <SpaceComponent height={14} />
             <SectionComponent>
-                <FlatList
-                    data={invoices.filter(item => item.status === status)}
-                    renderItem={renderInvoice}
-                    keyExtractor={(item, index) => index.toString()}
-                    refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
-                />
+                {
+                    isLoading
+                        ?
+                        <FlatList
+                            data={Array.from({ length: 10 })}
+                            renderItem={renderSkeleton}
+                            keyExtractor={(item, index) => index.toString()}
+                            refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+                        />
+                        :
+                        (
+                            invoices.filter(item => item.status === status).length !== 0
+                                ?
+                                <FlatList
+                                    data={invoices.filter(item => item.status === status)}
+                                    renderItem={renderInvoice}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+                                />
+                                :
+                                <TextComponent text='Không có data'/>
+                        )
+                }
             </SectionComponent>
-            <LoadingModalComponent visible={isLoading} />
+            <LoadingEmptyModalComponent visible={isLoading} />
         </ContainerComponent>
     )
 }

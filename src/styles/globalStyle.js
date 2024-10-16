@@ -53,6 +53,6 @@ export const globalStyle = StyleSheet.create({
         borderColor: appColors.gray3,
         borderRadius: 8,
         paddingHorizontal: 10,
-        justifyContent:'center'
+        justifyContent: 'center'
     }
 })

@@ -22,7 +22,7 @@ const LoadingModalComponent = (props: Props) => {
             <View style={[globalStyle.container, { backgroundColor: 'rgba(0, 0, 0, 0.5)', alignItems: 'center', justifyContent: 'center' }]}>
 
                 <ActivityIndicator color={appColors.white} size={32} />
-                <TextComponent text={mess ?? 'Loading'} color={appColors.white} />
+                <TextComponent text={mess ?? 'Đang tải'} color={appColors.white} />
             </View>
         </Modal>
     )

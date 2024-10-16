@@ -1,21 +1,21 @@
 import { ArrowCircleRight, SearchStatus, ShopAdd } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
 import { FlatList, Image, View } from 'react-native'
+import { useSelector } from 'react-redux'
 import { apiCustomer } from '../../apis/apiDTHome'
-import { CircleComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import { CircleComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, LoadingEmptyModalComponent, LoadingModalComponent, RowComponent, SectionComponent, SkeletonComponent, SpaceComponent, TextComponent } from '../../components'
 import InputComponent from '../../components/InputComponent'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
 import { images } from '../../constants/images'
 import AddNewCustomerModal from './AddNewCustomerModal'
-import { useSelector } from 'react-redux'
-import customerReducer from '../../srcRedux/reducers/customerReducer'
+import { appInfors } from '../../constants/appInfors'
 
 const CustomerScreen = ({ navigation, route }) => {
   const [searchKey, setSearchKey] = useState('')
   const [dataCustomers, setDataCustomers] = useState([])
   const [dataCustomerOriginals, setDataCustomerOriginals] = useState([]);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [isShowModalAdd, setIsShowModalAdd] = useState(false)
 
   const checkUpdateCustomer = useSelector(state => state.customerReducer.updatedValue)
@@ -61,14 +61,6 @@ const CustomerScreen = ({ navigation, route }) => {
     }
   }
 
-  // xem vui thoi
-  useEffect(() => {
-    console.log(searchKey)
-  }, [searchKey])
-  useEffect(() => {
-    console.log('data cus:', dataCustomers)
-  }, [dataCustomers])
-
   const renderItemCustomer = ({ item }) => {
     return (
       <RowComponent
@@ -100,13 +92,43 @@ const CustomerScreen = ({ navigation, route }) => {
     )
   }
 
+  const renderSkeletonCustomer = () => {
+    return (
+      <RowComponent
+        style={{
+          borderBottomWidth: 0.5,
+          borderBottomColor: appColors.gray,
+          paddingVertical: 10,
+        }}
+      >
+        <RowComponent style={{
+          justifyContent: 'flex-start'
+        }}>
+          <CircleComponent>
+            <SkeletonComponent height={40} width={40} />
+          </CircleComponent>
+          <SpaceComponent width={10} />
+          <View>
+            <SkeletonComponent height={14} width={appInfors.sizes.WIDTH * 0.6} />
+            <SpaceComponent height={8} />
+            <SkeletonComponent height={14} width={appInfors.sizes.WIDTH * 0.4} />
+          </View>
+        </RowComponent>
+
+        <RowComponent >
+          <SkeletonComponent height={20} width={20} />
+        </RowComponent>
+      </RowComponent>
+    )
+  }
+
   return (
     <ContainerComponent>
       <HeaderComponent
         text='Người thuê'
         isBack
         buttonRight={<ShopAdd size={22} color={appColors.primary} />}
-        onRightPress={() => navigation.navigate('AddNewCustomerScreen', { actionType: 'create' })}
+        onRightPress={() => { setIsShowModalAdd(true) }}
       />
       {/* search bar */}
       <SectionComponent>
@@ -121,19 +143,33 @@ const CustomerScreen = ({ navigation, route }) => {
       </SectionComponent>
 
       <SectionComponent>
-        <FlatList
-          data={dataCustomers}
-          renderItem={renderItemCustomer}
-          keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={{ paddingBottom: 150 }}
-          showsVerticalScrollIndicator={false}
+        {/* //load skeleton */}
+        {
+          isLoading
+            ?
+            <FlatList
+              data={Array(14)}
+              renderItem={renderSkeletonCustomer}
+              keyExtractor={(item, index) => index.toString()}
+              contentContainerStyle={{ paddingBottom: 150 }}
+              showsVerticalScrollIndicator={false}
 
-        />
+            />
+            :
+            <FlatList
+              data={dataCustomers}
+              renderItem={renderItemCustomer}
+              keyExtractor={(item, index) => index.toString()}
+              contentContainerStyle={{ paddingBottom: 150 }}
+              showsVerticalScrollIndicator={false}
+            />
+        }
+
 
       </SectionComponent>
       <FloatAddButtonComponent onPress={() => { setIsShowModalAdd(true) }} />
       <AddNewCustomerModal visible={isShowModalAdd} onClose={() => setIsShowModalAdd(false)} actionType={'create'} />
-      <LoadingModalComponent visible={isLoading} />
+      <LoadingEmptyModalComponent visible={isLoading} />
     </ContainerComponent>
   )
 }

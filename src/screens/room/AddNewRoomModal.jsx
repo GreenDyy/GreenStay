@@ -232,7 +232,7 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
   };
 
   return (
-    <Modal visible={visible}>
+    <Modal visible={visible} >
       <ContainerComponent>
         {
           actionType === 'create'

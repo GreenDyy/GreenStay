@@ -1,6 +1,6 @@
 import { View, Text, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { CardComponent, ContainerComponent, FloatAddButtonComponent, LoadingModalComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components'
+import { CardComponent, ContainerComponent, FloatAddButtonComponent, LoadingEmptyModalComponent, LoadingModalComponent, RowComponent, SectionComponent, SkeletonComponent, SpaceComponent, TextComponent } from '../../components'
 import { apiCustomer, apiRental, apiRoom } from '../../apis/apiDTHome'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
@@ -76,19 +76,57 @@ const ContractWithStatusScreen = ({ navigation, route }) => {
         )
     }
 
+    const renderSkeleton = () => {
+        return (
+            <RowComponent style={{ borderBottomColor: appColors.gray2, borderBottomWidth: 1, padding: 14 }}>
+                <View>
+                    <SkeletonComponent height={10} width={80} />
+                    <SpaceComponent height={5} />
+                    <SkeletonComponent height={14} width={100} />
+                    <SpaceComponent height={5} />
+                    <SkeletonComponent height={10} width={65} />
+                </View>
+
+                <View style={{ alignItems: 'flex-end' }}>
+                    <SkeletonComponent height={14} width={140} />
+                    <SpaceComponent height={5} />
+                    <SkeletonComponent height={10} width={50} />
+                </View>
+            </RowComponent>
+        )
+    }
+
     return (
         <ContainerComponent style={{ marginTop: 10 }}>
             <SpaceComponent height={14} />
 
-            <FlatList
-                data={contracts.filter((item) => item.isRenting === isRenting)}
-                renderItem={renderContract}
-                keyExtractor={(item, index) => index.toString()}  
-                refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
-            />
-             <FloatAddButtonComponent onPress={() => { setIsShowModalContractAdd(true) }} />
-             <AddContractModal visible={isShowModalContractAdd} onClose={() => setIsShowModalContractAdd(false)} />
-            <LoadingModalComponent visible={isLoading} />
+            {
+                isLoading
+                    ?
+                    <FlatList
+                        data={Array.from({ length: 10 })}
+                        renderItem={renderSkeleton}
+                        keyExtractor={(item, index) => index.toString()}
+                        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+                    />
+                    :
+                    (
+                        contracts.filter((item) => item.isRenting === isRenting).length !== 0
+                            ?
+                            <FlatList
+                                data={contracts.filter((item) => item.isRenting === isRenting)}
+                                renderItem={renderContract}
+                                keyExtractor={(item, index) => index.toString()}
+                                refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+                            />
+                            :
+                            <TextComponent text='Không có data' />
+                    )
+            }
+
+            <FloatAddButtonComponent onPress={() => { setIsShowModalContractAdd(true) }} />
+            <AddContractModal visible={isShowModalContractAdd} onClose={() => setIsShowModalContractAdd(false)} />
+            <LoadingEmptyModalComponent visible={isLoading} />
         </ContainerComponent>
     )
 }

@@ -1,6 +1,6 @@
 import Geolocation from '@react-native-community/geolocation'
 import axios from 'axios'
-import { ArrowCircleDown, Book, Briefcase, DollarCircle, Drop, Flash, Notification, Trash } from 'iconsax-react-native'
+import { ArrowCircleDown, Book, Briefcase, DollarCircle, Drop, Flash, Heart, House, House2, Logout, LogoutCurve, Notification, Profile2User, Setting, Setting2, Setting3, Setting4, Share, Trash } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
 import { Alert, Image, Modal, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
@@ -153,8 +153,26 @@ const HomeScreen = ({ navigation }) => {
   }
 
   const handleLogout = () => {
-    dispatch(removeAuth())
-    removeItemDataStorage('authData')
+    Alert.alert(
+      'Đăng xuất',
+      'Bạn có muốn đăng xuất không',
+      [
+        {
+          text: 'Huỷ',
+          style: 'cancel'
+        },
+        {
+          text: 'Đồng ý',
+          onPress: () => {
+            dispatch(removeAuth())
+            removeItemDataStorage('authData')
+          }
+        },
+      ],
+      { cancelable: true }
+    )
+
+
   }
 
   return (
@@ -250,25 +268,70 @@ const HomeScreen = ({ navigation }) => {
         </RowComponent>
       </SectionComponent>
       <DetailPriceModal visible={isShowModalPrice} onClose={() => setIsShowModalPrice(false)} typePrice={typePrice} />
+
       {/* //thêm drawer mà lỗi hoài bất lực quá làm tạm cái này :(( */}
       <Modal
         visible={isShowDrawer}
-
         transparent
-        statusBarTranslucent>
+         animationType='fade'
+      >
 
         <View style={[globalStyle.container, { backgroundColor: 'rgba(0, 0, 0, 0.5)', alignItems: 'center', justifyContent: 'center' }]}>
           <RowComponent style={{ flex: 1 }}>
-            <View style={{ width: '50%', backgroundColor: 'white', height: '100%', borderTopRightRadius: 10, borderBottomRightRadius: 10, paddingVertical: 40 }}>
-              <SectionComponent>
-                <TouchableOpacity onPress={handleLogout}>
-                  <TextComponent text='Đăng xuất' />
-                </TouchableOpacity>
+            <View style={{ width: '80%', backgroundColor: appColors.primary, height: '100%', borderTopRightRadius: 10, borderBottomRightRadius: 10, paddingVertical: 40 }}>
 
+              <SectionComponent style={{ backgroundColor: appColors.primary, paddingTop: 20 }}>
+                <CircleComponent size={60}>
+                  <Image source={authData.photoUrl ? { uri: authData.photoUrl } : images.avatar_null} style={{ height: 60, width: 60 }} resizeMode='cover' />
+                </CircleComponent>
+                <SpaceComponent height={3} />
+                <TextComponent text={authData.ownerName} isTitle fontSize={16} color={appColors.white} />
+                <SpaceComponent height={3} />
+                <TextComponent text={authData.phoneNumber} fontSize={12} fontFamily={appFonts.mediumOpenSans} color={appColors.white} />
+              </SectionComponent>
+
+              <SectionComponent style={{ backgroundColor: appColors.white, paddingTop: 20 }}>
+                <RowComponent style={{ justifyContent: 'flex-start' }} onPress={() => setIsShowDrawer(false)}>
+                  <Heart size={22} color={appColors.text} />
+                  <SpaceComponent width={20} />
+                  <TextComponent text='Trang chủ' />
+                </RowComponent>
+
+                <SpaceComponent height={14} />
+
+                <RowComponent style={{ justifyContent: 'flex-start' }} onPress={handleLogout}>
+                  <Setting2 size={22} color={appColors.text} />
+                  <SpaceComponent width={20} />
+                  <TextComponent text='Cài đặt' />
+                </RowComponent>
+
+                <SpaceComponent height={14} />
+
+                <RowComponent style={{ justifyContent: 'flex-start' }} onPress={handleLogout}>
+                  <Share size={22} color={appColors.text} />
+                  <SpaceComponent width={20} />
+                  <TextComponent text='Chia sẽ' />
+                </RowComponent>
+
+                <SpaceComponent height={14} />
+
+                <RowComponent style={{ justifyContent: 'flex-start' }} onPress={handleLogout}>
+                  <Profile2User size={22} color={appColors.text} />
+                  <SpaceComponent width={20} />
+                  <TextComponent text='Về chúng tôi' />
+                </RowComponent>
+              </SectionComponent>
+
+              <SectionComponent style={{ flex: 1, borderTopWidth: 1, borderColor: appColors.gray, paddingTop: 20, backgroundColor: appColors.white }}>
+                <RowComponent style={{ justifyContent: 'flex-start' }} onPress={handleLogout}>
+                  <LogoutCurve size={22} color={appColors.text} />
+                  <SpaceComponent width={20} />
+                  <TextComponent text='Đăng xuất' />
+                </RowComponent>
               </SectionComponent>
             </View>
 
-            <TouchableOpacity style={{ width: '50%', backgroundColor: 'rgba(0, 0, 0, 0.5)', height: '100%' }} onPress={() => setIsShowDrawer(false)}>
+            <TouchableOpacity style={{ width: '20%', height: '100%' }} onPress={() => setIsShowDrawer(false)}>
 
             </TouchableOpacity>
           </RowComponent>

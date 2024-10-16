@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { FlatList, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { apiCustomer, apiMemberOfRental, apiRental, apiRoom } from '../../apis/apiDTHome';
-import { AvatarGroupComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, LoadingModalComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components';
+import { AvatarGroupComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, LoadingEmptyModalComponent, LoadingModalComponent, RowComponent, SectionComponent, SkeletonComponent, SpaceComponent, TextComponent } from '../../components';
 import InputComponent from '../../components/InputComponent';
 import { appColors } from '../../constants/appColors';
 import { appFonts } from '../../constants/appFonts';
@@ -11,6 +11,7 @@ import { images } from '../../constants/images';
 import { globalStyle } from '../../styles/globalStyle';
 import AddNewRoomModal from './AddNewRoomModal';
 import { useSelector } from 'react-redux';
+import { appInfors } from '../../constants/appInfors';
 
 const RoomScreen = ({ navigation, route }) => {
   const [isGrid, setIsGird] = useState(true)
@@ -148,6 +149,31 @@ const RoomScreen = ({ navigation, route }) => {
     )
   }
 
+  const renderSkeletonList = ({ item }) => {
+    return (
+      <TouchableOpacity onPress={() => handleDetailRoom(item.roomId)} style={[localStyle.cardRoomList, globalStyle.shadow]}>
+        <View style={{
+          paddingHorizontal: 16,
+          paddingVertical: 10,
+        }}>
+          <SkeletonComponent height={14} width={appInfors.sizes.WIDTH * (Math.random() * (0.8 - 0.1) + 0.1)} />
+          <SpaceComponent height={8} />
+          <SkeletonComponent height={14} width={appInfors.sizes.WIDTH * (Math.random() * (0.8 - 0.1) + 0.1)} />
+          <SpaceComponent height={8} />
+          <RowComponent style={{ justifyContent: 'flex-start' }}>
+            {
+              Array.from({ length: Math.floor(Math.random() * 4) + 1 }).map((_, index) => {
+                return (
+                  <SkeletonComponent key={index} height={24} width={24} borderRadius={999} />
+                );
+              })
+            }
+          </RowComponent>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
   return (
     <ContainerComponent>
       <HeaderComponent
@@ -168,21 +194,37 @@ const RoomScreen = ({ navigation, route }) => {
         />
       </SectionComponent>
 
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        key={isGrid ? 'grid' : 'list'}
-        data={dataRooms}
-        renderItem={isGrid ? renderItemGrid : renderItemList}
-        numColumns={isGrid ? 2 : 1}
-        columnWrapperStyle={isGrid ? { justifyContent: 'center', paddingHorizontal: 8 } : null}
-        contentContainerStyle={{ paddingBottom: 70 }}
-        keyExtractor={(item, index) => index.toString()}
-        initialNumToRender={6}
-        maxToRenderPerBatch={10}
-      />
+      {
+        // load skeleton
+        isLoading
+          ?
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            data={Array(10)}
+            renderItem={renderSkeletonList}
+            numColumns={1}
+            contentContainerStyle={{ paddingBottom: 70 }}
+            keyExtractor={(item, index) => index.toString()}
+            initialNumToRender={6}
+            maxToRenderPerBatch={10}
+          />
+          :
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            key={isGrid ? 'grid' : 'list'}
+            data={dataRooms}
+            renderItem={isGrid ? renderItemGrid : renderItemList}
+            numColumns={isGrid ? 2 : 1}
+            columnWrapperStyle={isGrid ? { justifyContent: 'center', paddingHorizontal: 8 } : null}
+            contentContainerStyle={{ paddingBottom: 70 }}
+            keyExtractor={(item, index) => index.toString()}
+            initialNumToRender={6}
+            maxToRenderPerBatch={10}
+          />
+      }
       <FloatAddButtonComponent onPress={() => { setIsShowModalAdd(true) }} />
       <AddNewRoomModal visible={isShowModalAdd} onClose={() => setIsShowModalAdd(false)} actionType={'create'} />
-      <LoadingModalComponent visible={isLoading} />
+      <LoadingEmptyModalComponent visible={isLoading} />
     </ContainerComponent>
   )
 }
