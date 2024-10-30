@@ -1,4 +1,4 @@
-import { View, Text, FlatList } from 'react-native'
+import { View, Text, FlatList, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { CardComponent, ContainerComponent, FloatAddButtonComponent, LoadingEmptyModalComponent, LoadingModalComponent, RowComponent, SectionComponent, SkeletonComponent, SpaceComponent, TextComponent } from '../../components'
 import { apiCustomer, apiRental, apiRoom } from '../../apis/apiDTHome'
@@ -8,6 +8,8 @@ import { getDateStringType2 } from '../../utils/Utils'
 import AddContractModal from './AddContractModal'
 import { useSelector } from 'react-redux'
 import { RefreshControl } from 'react-native-gesture-handler'
+import { images } from '../../constants/images'
+import { appInfors } from '../../constants/appInfors'
 
 const ContractWithStatusScreen = ({ navigation, route }) => {
     const { isRenting } = route.params
@@ -99,7 +101,6 @@ const ContractWithStatusScreen = ({ navigation, route }) => {
     return (
         <ContainerComponent style={{ marginTop: 10 }}>
             <SpaceComponent height={14} />
-
             {
                 isLoading
                     ?
@@ -120,7 +121,11 @@ const ContractWithStatusScreen = ({ navigation, route }) => {
                                 refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
                             />
                             :
-                            <TextComponent text='Không có data' />
+                            <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: appInfors.sizes.HEIGHT*0.15}}>
+                                <Image source={images.contract} style={{ height: 200, width: 200 }} resizeMode='stretch'/>
+                                <SpaceComponent height={14} />
+                                <TextComponent text='Không có hợp đồng nào' isTitle />
+                            </View>
                     )
             }
 

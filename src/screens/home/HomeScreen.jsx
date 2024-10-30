@@ -97,11 +97,11 @@ const HomeScreen = ({ navigation }) => {
     try {
       const res = await axios.get(api)
       const curLocation = res.data.items[0]
-      console.log(curLocation)
+      console.log('My location nè: ', curLocation)
       setMyLocation(curLocation)
     }
     catch (e) {
-      console.log(e)
+      console.log('Lỗi lấy my location: ',e)
     }
   }
 
@@ -273,7 +273,7 @@ const HomeScreen = ({ navigation }) => {
       <Modal
         visible={isShowDrawer}
         transparent
-         animationType='fade'
+        animationType='fade'
       >
 
         <View style={[globalStyle.container, { backgroundColor: 'rgba(0, 0, 0, 0.5)', alignItems: 'center', justifyContent: 'center' }]}>

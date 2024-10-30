@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList, RefreshControl, View } from 'react-native'
+import { FlatList, Image, RefreshControl, View } from 'react-native'
 import { useSelector } from 'react-redux'
 import { apiCustomer, apiInvoice, apiRoom } from '../../apis/apiDTHome'
 import { ContainerComponent, LoadingEmptyModalComponent, LoadingModalComponent, RowComponent, SectionComponent, SkeletonComponent, SpaceComponent, TextComponent } from '../../components'
 import { appColors } from '../../constants/appColors'
 import { appFonts } from '../../constants/appFonts'
 import { getDateStringType2 } from '../../utils/Utils'
+import { images } from '../../constants/images'
+import { appInfors } from '../../constants/appInfors'
 
 const InvoiceWithStatusScreen = ({ navigation, route }) => {
     const invoicesRedux = useSelector((state) => state.invoiceReducer.invoiceData)
@@ -109,31 +111,33 @@ const InvoiceWithStatusScreen = ({ navigation, route }) => {
     return (
         <ContainerComponent style={{ marginTop: 10 }}>
             <SpaceComponent height={14} />
-            <SectionComponent>
-                {
-                    isLoading
-                        ?
-                        <FlatList
-                            data={Array.from({ length: 10 })}
-                            renderItem={renderSkeleton}
-                            keyExtractor={(item, index) => index.toString()}
-                            refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
-                        />
-                        :
-                        (
-                            invoices.filter(item => item.status === status).length !== 0
-                                ?
-                                <FlatList
-                                    data={invoices.filter(item => item.status === status)}
-                                    renderItem={renderInvoice}
-                                    keyExtractor={(item, index) => index.toString()}
-                                    refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
-                                />
-                                :
-                                <TextComponent text='Không có data'/>
-                        )
-                }
-            </SectionComponent>
+            {
+                isLoading
+                    ?
+                    <FlatList
+                        data={Array.from({ length: 10 })}
+                        renderItem={renderSkeleton}
+                        keyExtractor={(item, index) => index.toString()}
+                        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+                    />
+                    :
+                    (
+                        invoices.filter(item => item.status === status).length !== 0
+                            ?
+                            <FlatList
+                                data={invoices.filter(item => item.status === status)}
+                                renderItem={renderInvoice}
+                                keyExtractor={(item, index) => index.toString()}
+                                refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+                            />
+                            :
+                            <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: appInfors.sizes.HEIGHT * 0.15 }}>
+                                <Image source={images.bill} style={{ height: 200, width: 200 }} resizeMode='stretch' />
+                                <SpaceComponent height={14} />
+                                <TextComponent text='Không có hoá đơn nào' isTitle />
+                            </View>
+                    )
+            }
             <LoadingEmptyModalComponent visible={isLoading} />
         </ContainerComponent>
     )

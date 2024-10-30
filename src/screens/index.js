@@ -1,5 +1,6 @@
 import HomeScreen from "./home/HomeScreen"
 import SplashScreen from "./SplashScreen"
+import OnBoardingScreen from "./auth/OnBoardingScreen"
 import CustomerScreen from "./customer/CustomerScreen"
 import RoomScreen from "./room/RoomScreen"
 import LoginScreen from "./auth/LoginScreen"
@@ -23,6 +24,7 @@ import DetailInvoiceScreen from "./invoice/DetailInvoiceScreen"
 
 export {
     HomeScreen,
+    OnBoardingScreen,
     CustomerScreen,
     RoomScreen,
     VerifyAccountScreen,

@@ -13,6 +13,7 @@ interface Props {
     style?: StyleProp<TextStyle>;
     isTitle?: boolean;
     numberOfLines?: number
+    textAlign?: 'justify' | 'center' | 'left' | 'right'
 }
 
 const TextComponent = (props: Props) => {
@@ -24,7 +25,8 @@ const TextComponent = (props: Props) => {
         fontFamily,
         style,
         isTitle = false,
-        numberOfLines
+        numberOfLines,
+        textAlign = 'left'
     } = props;
 
     const fontSizeDefault = Platform.OS === 'ios' ? 16 : 14
@@ -37,10 +39,11 @@ const TextComponent = (props: Props) => {
                     flex: flex ?? 0,
                     fontSize: fontSize ?? (isTitle ? 18 : fontSizeDefault),
                     fontFamily: fontFamily ?? (isTitle ? appFonts.boldOpenSans : appFonts.regularOpenSans),
+                    textAlign: textAlign
                 },
                 style,
             ]}
-            numberOfLines={numberOfLines ?? 1}
+        // numberOfLines={numberOfLines ?? 1}
         >
             {text}
         </Text>

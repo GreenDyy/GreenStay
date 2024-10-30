@@ -18,7 +18,7 @@ const ContainerComponent = (props: Props) => {
                 <ScrollView
                     style={[
                         globalStyle.container,
-                        { marginTop: StatusBar.currentHeight },
+                        { paddingTop: StatusBar.currentHeight },
                         style]
                     }
                     showsVerticalScrollIndicator={false}
@@ -31,7 +31,7 @@ const ContainerComponent = (props: Props) => {
         :
         (
             <SafeAreaView style={[globalStyle.container,
-            { marginTop: StatusBar.currentHeight },
+            { paddingTop: StatusBar.currentHeight },
                 style]}>
                 {children}
             </SafeAreaView>

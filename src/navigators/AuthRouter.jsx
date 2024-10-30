@@ -1,15 +1,34 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import React from 'react'
-import { LoginScreen, SetUpScreen, SignUpScreen, VerifyAccountScreen } from '../screens'
+import React, { useEffect, useState } from 'react'
+import { LoginScreen, OnBoardingScreen, SetUpScreen, SignUpScreen, VerifyAccountScreen } from '../screens'
+import { getDataStorage, setDataStorage } from '../utils/Utils';
 
 const AuthRouter = () => {
+    const [isFirstLaunch, setIsFirstLaunch] = useState(null);
     const Stack = createNativeStackNavigator()
+
+    useEffect(() => {
+        checkFirstLaunch()
+    }, [])
+
+    const checkFirstLaunch = async () => {
+        const isFirst = await getDataStorage('isFirstLaunch')
+        if (isFirst === null) {
+            //đây là lần đầu
+            setIsFirstLaunch(true)
+            await setDataStorage('isFirstLaunch', 'hihi')
+        }
+        else {
+            setIsFirstLaunch(false)
+        }
+    }
 
     return (
         <Stack.Navigator screenOptions={{
             headerShown: false,
             animation: 'flip'
         }}>
+            {!isFirstLaunch && <Stack.Screen name='OnBoardingScreen' component={OnBoardingScreen} />}
             <Stack.Screen name='LoginScreen' component={LoginScreen} />
             <Stack.Screen name='SignUpScreen' component={SignUpScreen} />
             <Stack.Screen name='VerifyAccountScreen' component={VerifyAccountScreen} />
