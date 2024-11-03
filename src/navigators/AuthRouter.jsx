@@ -17,10 +17,16 @@ const AuthRouter = () => {
             //đây là lần đầu
             setIsFirstLaunch(true)
             await setDataStorage('isFirstLaunch', 'hihi')
+            console.log('lần đầu nè')
         }
         else {
             setIsFirstLaunch(false)
+            console.log('lần thứ n rùi :<')
         }
+    }
+
+    if (isFirstLaunch === null) {
+        return null;
     }
 
     return (
@@ -28,7 +34,7 @@ const AuthRouter = () => {
             headerShown: false,
             animation: 'flip'
         }}>
-            {!isFirstLaunch && <Stack.Screen name='OnBoardingScreen' component={OnBoardingScreen} />}
+            {isFirstLaunch && <Stack.Screen name='OnBoardingScreen' component={OnBoardingScreen} />}
             <Stack.Screen name='LoginScreen' component={LoginScreen} />
             <Stack.Screen name='SignUpScreen' component={SignUpScreen} />
             <Stack.Screen name='VerifyAccountScreen' component={VerifyAccountScreen} />

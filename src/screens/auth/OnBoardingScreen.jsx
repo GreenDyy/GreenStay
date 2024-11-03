@@ -17,7 +17,7 @@ const OnBoardingScreen = ({ navigation }) => {
             console.log('ko dc nua dau')
         }
         else {
-            console.log('manh len aaa')
+            console.log('sắp tới rồi')
         }
     }, [curIndex])
 

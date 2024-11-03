@@ -101,7 +101,7 @@ const HomeScreen = ({ navigation }) => {
       setMyLocation(curLocation)
     }
     catch (e) {
-      console.log('Lỗi lấy my location: ',e)
+      console.log('Lỗi lấy my location: ', e)
     }
   }
 
@@ -113,6 +113,7 @@ const HomeScreen = ({ navigation }) => {
         alignItems: 'center'
       }}>
         <SquareBorderComponent height={50} width={50} backgroundColor={appColors.bgSquare}
+          style={globalStyle.shadow}
           onPress={() => handlePressCategory(item.id)}
         >
           {item.id === 'water' && <Drop size={30} color={appColors.water} variant='Bold' />}
@@ -122,7 +123,6 @@ const HomeScreen = ({ navigation }) => {
         </SquareBorderComponent>
         <SpaceComponent height={8} />
         <TextComponent text={item.title} fontSize={12} />
-
       </View>
     )
   }
@@ -182,7 +182,7 @@ const HomeScreen = ({ navigation }) => {
 
         <RowComponent>
           <CircleComponent onPress={() => setIsShowDrawer(true)}>
-            <Image source={authData.photoUrl ? { uri: authData.photoUrl } : images.avatar_null} style={{ height: 40, width: 40 }} resizeMode='cover' />
+            <Image source={authData.photoUrl ? { uri: authData.photoUrl } : images.avatar_null} style={[{ height: 40, width: 40 }, globalStyle.shadow]} resizeMode='cover' />
           </CircleComponent>
 
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -195,14 +195,14 @@ const HomeScreen = ({ navigation }) => {
           </View>
 
           <SquareBorderComponent onPress={() => Alert.alert('Thông báo')}>
-            <Notification size={22} color={appColors.primary} />
+            <Notification size={22} color={appColors.primary} variant='Bold' />
           </SquareBorderComponent>
         </RowComponent>
       </SectionComponent>
 
 
       <SectionComponent>
-        <Image source={{ uri: 'https://i.pinimg.com/736x/49/e2/07/49e207af9cfd72594c6788c1c5589c2d.jpg' }}
+        <Image source={{ uri: 'https://i.pinimg.com/736x/fa/67/22/fa67228933b757a8fa74bd26d6859ad0.jpg' }}
           style={{ height: 200, width: '100%', borderRadius: 12 }} resizeMode='cover' />
       </SectionComponent>
 
