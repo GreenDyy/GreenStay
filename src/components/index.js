@@ -19,6 +19,8 @@ import DropDownComponent from "./DropDownComponent";
 import DropDownMultibleSelectComponent from "./DropDownMultibleSelectComponent";
 import SkeletonComponent from "./SkeletonComponent";
 import LoadingEmptyModalComponent from "./LoadingEmptyModalComponent";
+import LoadingAnimationComponent from "./LoadingAnimationComponent";
+import TestAnimationComponent from "./TestAnimationComponent";
 
 export {
     TextComponent,
@@ -41,5 +43,7 @@ export {
     DropDownComponent,
     DropDownMultibleSelectComponent,
     SkeletonComponent,
-    LoadingEmptyModalComponent
+    LoadingEmptyModalComponent,
+    LoadingAnimationComponent,
+    TestAnimationComponent
 }

@@ -44,10 +44,10 @@ const manamentData = [
     title: ' Quản lý hợp đồng'
   },
 
-  // {
-  //   id: 'qlphongchuadongtien',
-  //   title: ' Phòng chưa thanh toán'
-  // },
+  {
+    id: 'qltienich',
+    title: ' Tiện ích'
+  },
 ]
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
 const HomeScreen = ({ navigation }) => {
@@ -142,10 +142,8 @@ const HomeScreen = ({ navigation }) => {
         screen: 'ContractScreen',
       })
         break
-      // case 'qlphongchuadongtien': navigation.navigate('Contract', {
-      //   screen: 'ContractScreen',
-      // })
-      //   break
+      case 'qltienich': navigation.navigate('TestScreen')
+        break
       default:
         break
 
@@ -259,7 +257,7 @@ const HomeScreen = ({ navigation }) => {
                 onPress={() => handleNavigateManament(item.id)}>
                 {item.id === 'qlhoadon' && <Book size={size} color={appColors.primary} variant='Bold' />}
                 {item.id === 'qlhopdong' && <Briefcase size={size} color={appColors.primary} variant='Bold' />}
-                {item.id === 'qlphongchuadongtien' && <DollarCircle size={size} color={appColors.primary} variant='Bold' />}
+                {item.id === 'qltienich' && <DollarCircle size={size} color={appColors.primary} variant='Bold' />}
                 <SpaceComponent height={8} />
                 <TextComponent text={item.title} fontFamily={appFonts.mediumOpenSans} fontSize={12} />
               </CardComponent>
@@ -267,6 +265,9 @@ const HomeScreen = ({ navigation }) => {
           })}
         </RowComponent>
       </SectionComponent>
+
+      <SpaceComponent height={30} />
+      
       <DetailPriceModal visible={isShowModalPrice} onClose={() => setIsShowModalPrice(false)} typePrice={typePrice} />
 
       {/* //thêm drawer mà lỗi hoài bất lực quá làm tạm cái này :(( */}

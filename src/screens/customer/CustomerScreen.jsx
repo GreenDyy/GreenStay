@@ -1,6 +1,6 @@
 import { ArrowCircleRight, SearchStatus, ShopAdd } from 'iconsax-react-native'
 import React, { useEffect, useState } from 'react'
-import { FlatList, Image, View } from 'react-native'
+import { FlatList, Image, RefreshControl, View } from 'react-native'
 import { useSelector } from 'react-redux'
 import { apiCustomer } from '../../apis/apiDTHome'
 import { CircleComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, LoadingEmptyModalComponent, LoadingModalComponent, RowComponent, SectionComponent, SkeletonComponent, SpaceComponent, TextComponent } from '../../components'
@@ -17,6 +17,7 @@ const CustomerScreen = ({ navigation, route }) => {
   const [dataCustomerOriginals, setDataCustomerOriginals] = useState([]);
   const [isLoading, setIsLoading] = useState(true)
   const [isShowModalAdd, setIsShowModalAdd] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const checkUpdateCustomer = useSelector(state => state.customerReducer.updatedValue)
   const authData = useSelector((state) => state.authReducer.authData)
@@ -59,6 +60,12 @@ const CustomerScreen = ({ navigation, route }) => {
       console.log(e)
       setIsLoading(false)
     }
+  }
+
+  const onRefresh = async ()=>{
+    setIsRefreshing(true)
+    await fetchDataCustomers()
+    setIsRefreshing(false)
   }
 
   const renderItemCustomer = ({ item }) => {
@@ -162,6 +169,9 @@ const CustomerScreen = ({ navigation, route }) => {
               keyExtractor={(item, index) => index.toString()}
               contentContainerStyle={{ paddingBottom: 150 }}
               showsVerticalScrollIndicator={false}
+              refreshControl={
+                <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh}/>
+              }
             />
         }
 

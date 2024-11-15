@@ -56,6 +56,11 @@ const DetailContractScreen = ({ navigation, route }) => {
                             </RowComponent>
                             <SpaceComponent height={10} />
                             <RowComponent>
+                                <TextComponent text='Phòng: ' fontFamily={appFonts.semiBoldOpenSans} />
+                                <TextComponent text={contract.room.roomName} />
+                            </RowComponent>
+                            <SpaceComponent height={10} />
+                            <RowComponent>
                                 <TextComponent text='Trạng thái: ' fontFamily={appFonts.semiBoldOpenSans} />
                                 <TextComponent text={contract.isRenting ? "Còn trong hạn" : "Đã chấm dứt"} color={contract.isRenting ? appColors.primary : appColors.danger} />
                             </RowComponent>

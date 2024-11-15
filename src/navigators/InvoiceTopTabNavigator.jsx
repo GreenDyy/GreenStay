@@ -22,10 +22,6 @@ const InvoiceTopTabNavigator = () => {
                     width: '35%',
                     marginHorizontal: '8%'
                 },
-                tabBarItemStyle: {
-                    // borderRightWidth: route.name === 'Đã thanh toán' && 0.3
-
-                },
                 tabBarStyle: {
                     justifyContent: 'center',
                     borderTopWidth: 1,

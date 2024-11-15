@@ -1,6 +1,6 @@
 import { Category2, Layer, SearchStatus } from 'iconsax-react-native';
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, ImageBackground, RefreshControl, StyleSheet, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { apiCustomer, apiMemberOfRental, apiRental, apiRoom } from '../../apis/apiDTHome';
 import { AvatarGroupComponent, ContainerComponent, FloatAddButtonComponent, HeaderComponent, LoadingEmptyModalComponent, LoadingModalComponent, RowComponent, SectionComponent, SkeletonComponent, SpaceComponent, TextComponent } from '../../components';
@@ -20,6 +20,7 @@ const RoomScreen = ({ navigation, route }) => {
   const [dataRoomOriginals, setDataRoomOriginals] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isShowModalAdd, setIsShowModalAdd] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const checkUpdateRoom = useSelector(state => state.roomReducer.updatedValue)
   const authData = useSelector((state) => state.authReducer.authData)
@@ -86,6 +87,12 @@ const RoomScreen = ({ navigation, route }) => {
       console.error('Lỗi api khi fetch data rooms:', error);
       setIsLoading(false)
     }
+  }
+
+  const onRefresh = async () => {
+    setIsRefreshing(true)
+    await fetchDataRooms()
+    setIsRefreshing(false)
   }
 
   const handleDetailRoom = (roomId) => {
@@ -220,6 +227,9 @@ const RoomScreen = ({ navigation, route }) => {
             keyExtractor={(item, index) => index.toString()}
             initialNumToRender={6}
             maxToRenderPerBatch={10}
+            refreshControl={
+              <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+            }
           />
       }
       <FloatAddButtonComponent onPress={() => { setIsShowModalAdd(true) }} />

@@ -3,6 +3,7 @@ import { ActivityIndicator, Modal, View } from 'react-native'
 import { appColors } from '../constants/appColors'
 import { globalStyle } from '../styles/globalStyle'
 import TextComponent from './TextComponent'
+import LoadingAnimationComponent from './LoadingAnimationComponent'
 
 interface Props {
     visible: boolean,
@@ -21,7 +22,8 @@ const LoadingModalComponent = (props: Props) => {
 
             <View style={[globalStyle.container, { backgroundColor: 'rgba(0, 0, 0, 0.5)', alignItems: 'center', justifyContent: 'center' }]}>
 
-                <ActivityIndicator color={appColors.white} size={32} />
+                {/* <ActivityIndicator color={appColors.white} size={32} /> */}
+                <LoadingAnimationComponent/>
                 <TextComponent text={mess ?? 'Đang tải'} color={appColors.white} />
             </View>
         </Modal>

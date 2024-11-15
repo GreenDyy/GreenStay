@@ -179,6 +179,11 @@ const DetailInvoiceScreen = ({ navigation, route }) => {
                             </RowComponent>
                             <SpaceComponent height={10} />
                             <RowComponent>
+                                <TextComponent text='Phòng: ' fontFamily={appFonts.semiBoldOpenSans} />
+                                <TextComponent text={invoice.room.roomName} />
+                            </RowComponent>
+                            <SpaceComponent height={10} />
+                            <RowComponent>
                                 <TextComponent text='Trạng thái: ' fontFamily={appFonts.semiBoldOpenSans} />
                                 <TextComponent text={invoice.status} color={invoice.status === 'Chưa thanh toán' ? appColors.danger : appColors.primary} />
                             </RowComponent>
@@ -190,7 +195,7 @@ const DetailInvoiceScreen = ({ navigation, route }) => {
             <SectionComponent style={{ borderTopWidth: 0.5, borderColor: appColors.gray, paddingVertical: 10 }}>
                 <RowComponent>
                     <RowComponent>
-                        <House size={18} color={appColors.text} variant='Bulk'/>
+                        <House size={18} color={appColors.text} variant='Bulk' />
                         <SpaceComponent width={5} />
                         <TextComponent text='Tiền phòng' fontFamily={appFonts.semiBoldOpenSans} />
                     </RowComponent>
@@ -199,7 +204,7 @@ const DetailInvoiceScreen = ({ navigation, route }) => {
                 <View style={{ width: '100%', borderTopWidth: 0.5, borderColor: appColors.gray, marginVertical: 10 }} />
                 <RowComponent>
                     <RowComponent>
-                        <Flash size={18} color={appColors.text} variant='Bulk'/>
+                        <Flash size={18} color={appColors.text} variant='Bulk' />
                         <SpaceComponent width={5} />
                         <TextComponent text='Tiền điện' fontFamily={appFonts.semiBoldOpenSans} />
                     </RowComponent>
@@ -208,7 +213,7 @@ const DetailInvoiceScreen = ({ navigation, route }) => {
                 <View style={{ width: '100%', borderTopWidth: 0.5, borderColor: appColors.gray, marginVertical: 10 }} />
                 <RowComponent>
                     <RowComponent>
-                        <Drop size={18} color={appColors.text} variant='Bulk'/>
+                        <Drop size={18} color={appColors.text} variant='Bulk' />
                         <SpaceComponent width={5} />
                         <TextComponent text='Tiền nước' fontFamily={appFonts.semiBoldOpenSans} />
                     </RowComponent>
@@ -217,7 +222,7 @@ const DetailInvoiceScreen = ({ navigation, route }) => {
                 <View style={{ width: '100%', borderTopWidth: 0.5, borderColor: appColors.gray, marginVertical: 10 }} />
                 <RowComponent>
                     <RowComponent>
-                        <Trash size={18} color={appColors.text} variant='Bulk'/>
+                        <Trash size={18} color={appColors.text} variant='Bulk' />
                         <SpaceComponent width={5} />
                         <TextComponent text='Tiền rác' fontFamily={appFonts.semiBoldOpenSans} />
                     </RowComponent>
@@ -225,7 +230,7 @@ const DetailInvoiceScreen = ({ navigation, route }) => {
                 </RowComponent>
                 <View style={{ width: '100%', borderTopWidth: 0.5, borderColor: appColors.gray, marginVertical: 10 }} />
                 <RowComponent>
-                    <TextComponent text='Tổng tiền' fontFamily={appFonts.semiBoldOpenSans}  fontSize={16}/>
+                    <TextComponent text='Tổng tiền' fontFamily={appFonts.semiBoldOpenSans} fontSize={16} />
                     <TextComponent text={`${invoice?.amount?.toLocaleString()} VNĐ`} fontFamily={appFonts.mediumOpenSans} fontSize={16} color={appColors.danger} />
                 </RowComponent>
             </SectionComponent>

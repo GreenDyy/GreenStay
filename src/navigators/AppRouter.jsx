@@ -12,7 +12,6 @@ import AuthRouter from './AuthRouter';
 
 const AppRouter = () => {
     const [isShowSplash, setIsShowSplash] = useState(true)
-    const [isFirstLaunch, setIsFirstLaunch] = useState(null);
     const authData = useSelector((state) => state.authReducer.authData)
     const dispatch = useDispatch()
 
@@ -27,13 +26,15 @@ const AppRouter = () => {
         const timeId = setInterval(() => {
             handleCheckLogin()
         }, 1000 * 60 * 30)
-
+        // Gọi hàm ngay lần đầu tiên khi ứng dụng khởi chạy
+        handleCheckLogin();
         return () => clearInterval(timeId)
     }, [])
 
     const handleCheckLogin = async () => {
         try {
             const authData = await getDataStorage('authData');
+            console.log('đang check login')
             if (authData) {
                 if (isTokenExpired(authData)) {
                     console.log('Token has expired');

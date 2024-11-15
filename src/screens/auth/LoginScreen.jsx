@@ -86,7 +86,24 @@ const LoginScreen = ({ navigation }) => {
         catch (e) {
             console.error(e)
         }
+    }
 
+    const testMode = async () => {
+        try {
+            const authData = {
+                accessToken: 'test',
+            }
+            dispatch(addAuth(authData))
+            await setDataStorage('authData', authData)
+            showMessage({
+                message: 'Thông báo',
+                description: 'Test Mode',
+                type: 'success'
+            })
+        }
+        catch (e) {
+            console.error(e)
+        }
     }
 
     return (
@@ -121,6 +138,7 @@ const LoginScreen = ({ navigation }) => {
                 <ButtonComponent text='Đăng nhập' onPress={handleLogin} style={{ borderRadius: 50 }} />
                 <SpaceComponent height={10} />
                 <ButtonComponent text='Quên mật khẩu?' type='link' onPress={testFunc} style={{ color: 'black', alignSelf: 'center' }} />
+                <ButtonComponent text='Test Mode' type='link' onPress={testMode} style={{ color: 'black', alignSelf: 'center' }} />
 
             </SectionComponent>
 

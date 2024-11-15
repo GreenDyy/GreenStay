@@ -2,7 +2,7 @@ import { View, Text, Image, Alert, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { ButtonComponent, ContainerComponent, HeaderComponent, ImagePickerComponent, LoadingModalComponent, SectionComponent, SpaceComponent } from '../../components'
 import InputComponent from '../../components/InputComponent'
-import { apiRoom } from '../../apis/apiDTHome'
+import { apiRental, apiRoom } from '../../apis/apiDTHome'
 import { showMessage } from 'react-native-flash-message'
 import { appColors } from '../../constants/appColors'
 import { Image as ImageIcon, Trash } from 'iconsax-react-native'
@@ -37,9 +37,10 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
       fetchDataRoom()
     }
   }, [])
-  useEffect(() => {
-    console.log(dataRoom)
-  }, [dataRoom])
+
+  // useEffect(() => {
+  //   console.log(dataRoom)
+  // }, [dataRoom])
 
   const handleChangeValue = (key, value) => {
     let tempData = { ...dataRoom, ownerId: authData.ownerId }
@@ -187,23 +188,6 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
           onPress: async () => {
             setIsLoading(true);
             try {
-
-              // có ảnh thì mới xoá
-              if (dataRoom.photoUrl) {
-                try {
-                  const fileRef = storage().refFromURL(dataRoom.photoUrl);
-                  if (fileRef) {
-                    await fileRef.delete();
-                    console.log('Ảnh đã được xoá khỏi Firebase Storage');
-                  }
-                  setIsLoading(false)
-                }
-                catch (error) {
-                  console.error('Lỗi khi xoá ảnh: ', error);
-                  setIsLoading(false)
-                }
-              }
-
               await apiRoom(`/delete/${roomId}`, {}, 'delete');
               navigation.navigate('RoomScreen');
               showMessage({
@@ -212,12 +196,26 @@ const AddNewRoomModal = ({ roomId, actionType, visible, onClose }) => {
                 type: "success",
               });
               dispatch(updateRooms(Math.random()))
+              // có ảnh thì mới xoá
+              if (dataRoom.photoUrl) {
+                try {
+                  const fileRef = storage().refFromURL(dataRoom.photoUrl);
+                  if (fileRef) {
+                    await fileRef.delete();
+                    console.log('Ảnh đã được xoá khỏi Firebase Storage');
+                  }
+                }
+                catch (error) {
+                  console.error('Lỗi khi xoá ảnh: ', error);
+
+                }
+              }
               onClose()
             } catch (e) {
               console.log('Xoá phòng thất bại');
               showMessage({
                 message: "Thông báo",
-                description: "Xoá phòng thất bại do phòng đang được cho thuê",
+                description: "Không thể xoá do có dữ liệu liên quan",
                 type: "danger",
               });
               onClose()
