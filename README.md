@@ -1,1 +1,1 @@
-App mobile quản lý phòng trọ
+Mobile App For Rental Motel Management
